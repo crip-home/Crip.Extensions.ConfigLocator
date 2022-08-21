@@ -6,6 +6,14 @@ namespace Crip.Extensions.ConfigLocator.Generics;
 
 public static class TypeExtensions
 {
+    public static string SimpleName(this Type type)
+    {
+        var name = type.Name;
+        var index = name.IndexOf('`');
+
+        return index == -1 ? name : name.Substring(0, index);
+    }
+    
     public static bool IsNonAbstractClass(this Type type)
     {
         var typeInfo = type.GetTypeInfo();
