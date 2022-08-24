@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Crip.Extensions.ConfigLocator.Generics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -7,7 +8,8 @@ namespace Crip.Extensions.ConfigLocator.Configurations;
 
 public static class OptionsExtensions
 {
-    private static readonly Action<BinderOptions> ConfigureBinder = _ => { };
+    [ExcludeFromCodeCoverage]
+    private static Action<BinderOptions> ConfigureBinder => _ => { };
 
     public static Type GenericOptionsChangeTokenType(this Type typeArgument) =>
         typeof(IOptionsChangeTokenSource<>).MakeGenericType(typeArgument);

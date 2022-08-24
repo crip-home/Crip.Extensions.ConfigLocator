@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using Crip.Extensions.ConfigLocator.DependencyInjection;
 using Crip.Extensions.ConfigLocator.Generics;
@@ -17,19 +19,36 @@ public static class ConfigLocator
     {
         services.AddOptions();
 
-        var configurationTypes = assemblies.TypesWithAttribute<ConfigLocationAttribute>();
-
-        foreach (var type in configurationTypes)
+        foreach (var type in assemblies.TypesWithAttribute<ConfigLocationAttribute>())
         {
-            var types = new List<Type> { type };
-            var attribute = type.GetCustomAttribute<ConfigLocationAttribute>() ?? throw TypeLoadError();
-            var section = configuration.GetSection(attribute.SectionKey);
-            if (attribute.AdditionalTypes is not null) types.AddRange(attribute.AdditionalTypes);
-            services.CreateGenericOptions(section, types);
+            services.AddConfigurationOf(configuration, type);
         }
 
         return services;
     }
 
+    private static void AddConfigurationOf(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Type type)
+    {
+        var attribute = type.GetCustomAttribute<ConfigLocationAttribute>() ?? throw TypeLoadError();
+        var section = configuration.GetSection(attribute.SectionKey);
+        var types = type.WithAdditionalTypesOf(attribute);
+
+        services.CreateGenericOptions(section, types.ToArray());
+    }
+
+    private static IEnumerable<Type> WithAdditionalTypesOf(this Type type, ConfigLocationAttribute attribute)
+    {
+        yield return type;
+
+        foreach (var additionalType in attribute.AdditionalTypes ?? Type.EmptyTypes)
+        {
+            yield return additionalType;
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
     private static ApplicationException TypeLoadError() => new($"Type load error on {nameof(ConfigLocationAttribute)}");
 }
