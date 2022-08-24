@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using Crip.Extensions.ConfigLocator.DependencyInjection;
 using Crip.Extensions.ConfigLocator.Generics;
@@ -34,7 +36,7 @@ public static class ConfigLocator
         var section = configuration.GetSection(attribute.SectionKey);
         var types = type.WithAdditionalTypesOf(attribute);
 
-        services.CreateGenericOptions(section, types);
+        services.CreateGenericOptions(section, types.ToArray());
     }
 
     private static IEnumerable<Type> WithAdditionalTypesOf(this Type type, ConfigLocationAttribute attribute)
@@ -47,5 +49,6 @@ public static class ConfigLocator
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private static ApplicationException TypeLoadError() => new($"Type load error on {nameof(ConfigLocationAttribute)}");
 }

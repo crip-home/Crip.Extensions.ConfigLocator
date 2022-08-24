@@ -11,9 +11,9 @@ public static class ConfigurationInjectionExtensions
     public static void CreateGenericOptions(
         this IServiceCollection services,
         IConfigurationSection section,
-        IEnumerable<Type> types)
+        params Type[] optionTypes)
     {
-        foreach (var type in types)
+        foreach (var type in optionTypes)
         {
             services.CreateGenericOptions(section, type);
         }
