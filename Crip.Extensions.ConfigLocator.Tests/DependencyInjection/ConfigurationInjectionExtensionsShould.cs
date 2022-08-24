@@ -25,23 +25,23 @@ public class ConfigurationInjectionExtensionsShould
     }
 
     [Fact]
-    public void CreateGenericOptions_RegistersOptionsChangeTracking()
+    public void Configure_RegistersOptionsChangeTracking()
     {
-        _services.Object.CreateGenericOptions(GetSection(), typeof(MyOptions));
+        _services.Object.Configure(GetSection(), typeof(MyOptions));
         _services.ContainsSingletonService<IOptionsChangeTokenSource<MyOptions>, ConfigurationChangeTokenSource<MyOptions>>();
     }
 
     [Fact]
-    public void CreateGenericOptions_RegistersOptionsInstance()
+    public void Configure_RegistersOptionsInstance()
     {
-        _services.Object.CreateGenericOptions(GetSection(), typeof(MyOptions));
+        _services.Object.Configure(GetSection(), typeof(MyOptions));
         _services.ContainsSingletonService<IConfigureOptions<MyOptions>, NamedConfigureFromConfigurationOptions<MyOptions>>();
     }
 
     [Fact]
-    public void CreateGenericOptions_RegistersMultipleTypes()
+    public void Configure_RegistersMultipleTypes()
     {
-        _services.Object.CreateGenericOptions(GetSection(), typeof(MyOptions), typeof(MyOtherOptions));
+        _services.Object.Configure(GetSection(), typeof(MyOptions), typeof(MyOtherOptions));
         _services.ContainsSingletonService<IConfigureOptions<MyOptions>, NamedConfigureFromConfigurationOptions<MyOptions>>();
         _services.ContainsSingletonService<IConfigureOptions<MyOtherOptions>, NamedConfigureFromConfigurationOptions<MyOtherOptions>>();
     }
