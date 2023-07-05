@@ -1,16 +1,16 @@
 name: CI/CD pipeline
 
 on:
-  create:
+  push:
     tags:
       - v*
   pull_request:
     branches:
       - main
-      - master
 
 jobs:
-  build:
+  pack:
+    name: 📦 NuGet pack
 
     env:
       BUILD_CONFIG: Release
@@ -21,20 +21,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: 📄 checkout
         uses: actions/checkout@v3
 
-      - name: Dump GitHub context
+      - name: 💼 dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      - name: Set default Build Version
+      - name: 🔧 set default build version
         if: startsWith(github.ref, 'refs/tags/v') != true
         run: echo "BUILD_VERSION=1.0.0" >> $GITHUB_ENV
         shell: bash
 
-      - name: Get Build Version
+      - name: 🔧 get build version
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
           arrTag=(${GITHUB_REF//\// })
@@ -44,31 +44,38 @@ jobs:
           echo $BUILD_VERSION
         shell: bash
 
-      - name: Setup NuGet
+      - name: 📥 setup nuGet
         uses: NuGet/setup-nuget@v1.0.6
 
-      - name: 🔨 Setup .NET 3.1 & 6.0
+      - name: 📥 Setup .NET 3.1 & 6.0 & 7.0
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: |
             3.1.x
             6.0.x
+            7.0.x
 
-      - name: Restore dependencies
+      - name: 🔄 restore dependencies
         run: nuget restore $SOLUTION
 
-      - name: Build
-        run: dotnet build $LIBRARY --configuration $BUILD_CONFIG -p:Version=$BUILD_VERSION --no-restore
+      - name: 🛠️ build
+        run: dotnet build $LIBRARY -c $BUILD_CONFIG -p:Version=$BUILD_VERSION --no-restore -v m
 
-      - name: Run tests
-        run: dotnet test $TESTS /p:Configuration=$BUILD_CONFIG --no-restore --verbosity normal
+      - name: 🧪 run tests
+        run: dotnet test $TESTS /p:Configuration=$BUILD_CONFIG --no-restore -v m
 
-      - name: Publish GitHub NuGet
+      - name: 🚀 publish GitHub NuGet
         if: startsWith(github.ref, 'refs/tags/v')
-        run: dotnet nuget push **\*.nupkg -k ${GITHUB_TOKEN} -s https://nuget.pkg.github.com/crip-home/index.json --skip-duplicate
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dotnet nuget push **\*${BUILD_VERSION}.nupkg \
+            -s https://nuget.pkg.github.com/crip-home/index.json \
+            -k ${{secrets.GITHUB_TOKEN}} \
+            --skip-duplicate
 
-      - name: Publish
+      - name: 🚀 publish to nuget.org
         if: startsWith(github.ref, 'refs/tags/v')
-        run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
+        run: |
+          dotnet nuget push **\*${BUILD_VERSION}.nupkg \
+            -s 'https://api.nuget.org/v3/index.json' \
+            -k ${{secrets.NUGET_API_KEY}} \
+            --skip-duplicate

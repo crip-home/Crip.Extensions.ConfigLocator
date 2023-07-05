@@ -1,6 +1,6 @@
 ﻿namespace Crip.Extensions.ConfigLocator.Core60.Example.Configuration;
 
-public record DefaultOptions
+public record ManualOptions
 {
-    public string Property { get; set; } = "";
+    public string Foo { get; set; } = "";
 }
