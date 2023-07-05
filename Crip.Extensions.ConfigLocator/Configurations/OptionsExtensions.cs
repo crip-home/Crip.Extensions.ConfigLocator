@@ -41,6 +41,14 @@ public static class OptionsExtensions
         typeof(IConfigureOptions<>).MakeGenericType(typeArgument);
 
     /// <summary>
+    /// Create <see cref="IValidateOptions{T}"/> type.
+    /// </summary>
+    /// <param name="typeArgument">The type of options type arguments.</param>
+    /// <returns>Validate options with provided generic parameter.</returns>
+    public static Type GenericValidateOptionsType(this Type typeArgument) =>
+        typeof(IValidateOptions<>).MakeGenericType(typeArgument);
+
+    /// <summary>
     /// Create <see cref="NamedConfigureFromConfigurationOptions{T}"/> instance.
     /// </summary>
     /// <param name="section">The configuration section of the settings.</param>
@@ -49,4 +57,13 @@ public static class OptionsExtensions
     public static object GenericConfigureOptionsInstance(this IConfigurationSection section, Type[] typeArguments) =>
         typeof(NamedConfigureFromConfigurationOptions<>)
             .MakeGenericInstance(typeArguments, Options.DefaultName, section, ConfigureBinder);
+
+    /// <summary>
+    /// Create <see cref="DataAnnotationValidateOptions{T}"/> instance.
+    /// </summary>
+    /// <param name="typeArguments">The type of options type arguments.</param>
+    /// <returns>Validate options with provided generic parameter.</returns>
+    public static object GenericDataAnnotationValidateOptionsInstance(Type[] typeArguments) =>
+        typeof(DataAnnotationValidateOptions<>)
+            .MakeGenericInstance(typeArguments, Options.DefaultName);
 }

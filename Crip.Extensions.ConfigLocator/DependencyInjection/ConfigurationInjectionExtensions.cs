@@ -42,6 +42,29 @@ public static class ConfigurationInjectionExtensions
         services.Add(GenericConfigureOptions(section, optionsType));
     }
 
+    /// <summary>
+    /// Registers data annotation option validation instance for <paramref name="optionsType"/> type.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="optionsType">The type of options being configured.</param>
+    public static void AddDataAnnotationValidateOptions(this IServiceCollection services, Type optionsType) =>
+        services.Add(GenericDataAnnotationValidateOptions(optionsType));
+
+    /// <summary>
+    /// Registers custom option validation instance for <paramref name="optionsType"/> type.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="optionsType">The type of options being configured.</param>
+    /// <param name="validatorTypes">The list of custom validator types.</param>
+    public static void AddCustomValidateOptions(
+        this IServiceCollection services,
+        Type optionsType,
+        params Type[] validatorTypes)
+    {
+        foreach (Type validatorType in validatorTypes)
+            services.Add(GenericValidateOptions(optionsType, validatorType));
+    }
+
     private static ServiceDescriptor GenericOptionsChangeToken(
         IConfigurationSection section,
         params Type[] typeArguments)
@@ -60,5 +83,20 @@ public static class ConfigurationInjectionExtensions
         var instance = section.GenericConfigureOptionsInstance(typeArguments);
 
         return new ServiceDescriptor(serviceType, instance);
+    }
+
+    private static ServiceDescriptor GenericDataAnnotationValidateOptions(params Type[] typeArguments)
+    {
+        var serviceType = typeArguments[0].GenericValidateOptionsType();
+        var instance = OptionsExtensions.GenericDataAnnotationValidateOptionsInstance(typeArguments);
+
+        return new ServiceDescriptor(serviceType, instance);
+    }
+
+    private static ServiceDescriptor GenericValidateOptions(Type optionsType, Type validatorType)
+    {
+        var serviceType = optionsType.GenericValidateOptionsType();
+
+        return new ServiceDescriptor(serviceType, validatorType, ServiceLifetime.Singleton);
     }
 }
