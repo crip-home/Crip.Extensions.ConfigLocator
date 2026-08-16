@@ -10,59 +10,52 @@ namespace Crip.Extensions.ConfigLocator.DependencyInjection;
 /// </summary>
 public static class ConfigurationInjectionExtensions
 {
-    /// <summary>
-    /// Registers a configuration instance which <paramref name="optionTypes"/> will bind against.
-    /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
-    /// <param name="section">The configuration being bound.</param>
-    /// <param name="optionTypes">The types of options being configured.</param>
-    public static void Configure(
-        this IServiceCollection services,
-        IConfigurationSection section,
-        params Type[] optionTypes)
+    extension(IServiceCollection services)
     {
-        foreach (var type in optionTypes)
+        /// <summary>
+        /// Registers a configuration instance which <paramref name="optionTypes"/> will bind against.
+        /// </summary>
+        /// <param name="section">The configuration being bound.</param>
+        /// <param name="optionTypes">The types of options being configured.</param>
+        public void Configure(IConfigurationSection section, params Type[] optionTypes)
         {
-            services.Configure(section, type);
+            foreach (var type in optionTypes)
+            {
+                services.Configure(section, type);
+            }
         }
-    }
 
-    /// <summary>
-    /// Registers a configuration instance which <paramref name="optionsType"/> will bind against.
-    /// </summary>
-    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
-    /// <param name="section">The configuration being bound.</param>
-    /// <param name="optionsType">The type of options being configured.</param>
-    public static void Configure(
-        this IServiceCollection services,
-        IConfigurationSection section,
-        Type optionsType)
-    {
-        services.Add(GenericOptionsChangeToken(section, optionsType));
-        services.Add(GenericConfigureOptions(section, optionsType));
-    }
+        /// <summary>
+        /// Registers a configuration instance which <paramref name="optionsType"/> will bind against.
+        /// </summary>
+        /// <param name="section">The configuration being bound.</param>
+        /// <param name="optionsType">The type of options being configured.</param>
+        public void Configure(IConfigurationSection section, Type optionsType)
+        {
+            services.Add(GenericOptionsChangeToken(section, optionsType));
+            services.Add(GenericConfigureOptions(section, optionsType));
+        }
 
-    /// <summary>
-    /// Registers data annotation option validation instance for <paramref name="optionsType"/> type.
-    /// </summary>
-    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
-    /// <param name="optionsType">The type of options being configured.</param>
-    public static void AddDataAnnotationValidateOptions(this IServiceCollection services, Type optionsType) =>
-        services.Add(GenericDataAnnotationValidateOptions(optionsType));
+        /// <summary>
+        /// Registers data annotation option validation instance for <paramref name="optionsType"/> type.
+        /// </summary>
+        /// <param name="optionsType">The type of options being configured.</param>
+        public void AddDataAnnotationValidateOptions(Type optionsType) =>
+            services.Add(GenericDataAnnotationValidateOptions(optionsType));
 
-    /// <summary>
-    /// Registers custom option validation instance for <paramref name="optionsType"/> type.
-    /// </summary>
-    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
-    /// <param name="optionsType">The type of options being configured.</param>
-    /// <param name="validatorTypes">The list of custom validator types.</param>
-    public static void AddCustomValidateOptions(
-        this IServiceCollection services,
-        Type optionsType,
-        params Type[] validatorTypes)
-    {
-        foreach (Type validatorType in validatorTypes)
-            services.Add(GenericValidateOptions(optionsType, validatorType));
+        /// <summary>
+        /// Registers custom option validation instance for <paramref name="optionsType"/> type.
+        /// </summary>
+        /// <param name="optionsType">The type of options being configured.</param>
+        /// <param name="validatorTypes">The list of custom validator types.</param>
+        public void AddCustomValidateOptions(Type optionsType, params Type[] validatorTypes)
+        {
+            foreach (var validatorType in validatorTypes)
+            {
+                services.Add(GenericValidateOptions(optionsType, validatorType));
+            }
+        }
     }
 
     private static ServiceDescriptor GenericOptionsChangeToken(

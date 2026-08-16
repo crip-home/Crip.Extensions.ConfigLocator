@@ -15,57 +15,52 @@ namespace Crip.Extensions.ConfigLocator;
 /// </summary>
 public static class ConfigLocator
 {
-    /// <summary>
-    /// Register all options classes with <see cref="ConfigLocationAttribute"/>
-    /// attribute from provided <paramref name="assemblies"/>.
-    /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
-    /// <param name="configuration">The <see cref="IConfiguration"/> to read from.</param>
-    /// <param name="assemblies">
-    /// The collection of <see cref="Assembly"/> where search for classes with
-    /// <see cref="ConfigLocationAttribute"/> attribute.
-    /// </param>
-    /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-    public static IServiceCollection AddConfigLocator(
-        this IServiceCollection services,
-        IConfiguration configuration,
-        params Assembly[] assemblies)
+    extension(IServiceCollection services)
     {
-        services.AddOptions();
-
-        foreach (var type in assemblies.TypesWithAttribute<ConfigLocationAttribute>())
+        /// <summary>
+        /// Register all options classes with <see cref="ConfigLocationAttribute"/>
+        /// attribute from provided <paramref name="assemblies"/>.
+        /// </summary>
+        /// <param name="configuration">The <see cref="IConfiguration"/> to read from.</param>
+        /// <param name="assemblies">
+        /// The collection of <see cref="Assembly"/> where search for classes with
+        /// <see cref="ConfigLocationAttribute"/> attribute.
+        /// </param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        public IServiceCollection AddConfigLocator(IConfiguration configuration, params Assembly[] assemblies)
         {
-            services.AddConfigurationOf(configuration, type);
+            services.AddOptions();
+
+            foreach (var type in assemblies.TypesWithAttribute<ConfigLocationAttribute>())
+            {
+                services.AddConfigurationOf(configuration, type);
+            }
+
+            foreach (var type in assemblies.TypesWithAttribute<ConfigValidateAttribute>())
+            {
+                services.AddDataAnnotationValidateOptions(type);
+                services.AddCustomValidateOf(type);
+            }
+
+            return services;
         }
 
-        foreach (var type in assemblies.TypesWithAttribute<ConfigValidateAttribute>())
+        private void AddConfigurationOf(IConfiguration configuration, Type type)
         {
-            services.AddDataAnnotationValidateOptions(type);
-            services.AddCustomValidateOf(type);
+            var attribute = GetCustomAttribute<ConfigLocationAttribute>(type);
+            var section = configuration.GetSection(attribute.SectionKey);
+            var types = type.WithAdditionalTypesOf(attribute);
+
+            services.Configure(section, types.ToArray());
         }
 
-        return services;
-    }
+        private void AddCustomValidateOf(Type type)
+        {
+            var attribute = GetCustomAttribute<ConfigValidateAttribute>(type);
 
-    private static void AddConfigurationOf(
-        this IServiceCollection services,
-        IConfiguration configuration,
-        Type type)
-    {
-        var attribute = GetCustomAttribute<ConfigLocationAttribute>(type);
-        var section = configuration.GetSection(attribute.SectionKey);
-        var types = type.WithAdditionalTypesOf(attribute);
-
-        services.Configure(section, types.ToArray());
-    }
-
-    private static void AddCustomValidateOf(
-        this IServiceCollection services,
-        Type type)
-    {
-        var attribute = GetCustomAttribute<ConfigValidateAttribute>(type);
-
-        services.AddCustomValidateOptions(type, attribute.Validators);
+            services.AddCustomValidateOptions(type, attribute.Validators);
+        }
     }
 
     private static T GetCustomAttribute<T>(Type type)
@@ -80,5 +75,20 @@ public static class ConfigLocator
         {
             yield return additionalType;
         }
+    }
+}
+
+/// <summary>
+/// Configuration validation attribute with validator type.
+/// </summary>
+/// <typeparam name="TValidator">The type of the custom validator.</typeparam>
+public class ConfigValidateAttribute<TValidator> : ConfigValidateAttribute
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigValidateAttribute{T}"/> class.
+    /// </summary>
+    public ConfigValidateAttribute()
+    {
+        Validators = [typeof(TValidator)];
     }
 }

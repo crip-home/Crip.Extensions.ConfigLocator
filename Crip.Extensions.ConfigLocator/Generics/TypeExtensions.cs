@@ -9,68 +9,65 @@ namespace Crip.Extensions.ConfigLocator.Generics;
 /// </summary>
 public static class TypeExtensions
 {
-    /// <summary>
-    /// Get simple name of the type.
-    /// </summary>
-    /// <param name="type">The type to get name of.</param>
-    /// <returns>Simple name of the type (without generic parameters).</returns>
-    public static string SimpleName(this Type type)
+    /// <param name="type">The type to get the name of.</param>
+    extension(Type type)
     {
-        var name = type.Name;
-        var index = name.IndexOf('`');
-
-        return index == -1 ? name : name.Substring(0, index);
-    }
-
-    /// <summary>
-    /// Determine is the provided type is not abstract.
-    /// </summary>
-    /// <param name="type">The type to get value of.</param>
-    /// <returns><c>true</c> if type is not abstract, otherwise <c>false</c>.</returns>
-    public static bool IsNonAbstractClass(this Type type)
-    {
-        var typeInfo = type.GetTypeInfo();
-
-        if (typeInfo.IsSpecialName)
+        /// <summary>
+        /// Get a simple name of the type.
+        /// </summary>
+        /// <returns>Simple name of the type (without generic parameters).</returns>
+        public string SimpleName()
         {
-            return false;
+            var name = type.Name;
+            var index = name.IndexOf('`');
+
+            return index == -1 ? name : name.Substring(0, index);
         }
 
-        if (!typeInfo.IsClass || typeInfo.IsAbstract)
+        /// <summary>
+        /// Determine is the provided type is not abstract.
+        /// </summary>
+        /// <returns><c>true</c> if type is not abstract, otherwise <c>false</c>.</returns>
+        public bool IsNonAbstractClass()
         {
-            return false;
+            var typeInfo = type.GetTypeInfo();
+
+            if (typeInfo.IsSpecialName)
+            {
+                return false;
+            }
+
+            if (!typeInfo.IsClass || typeInfo.IsAbstract)
+            {
+                return false;
+            }
+
+            if (typeInfo.IsDefined(typeof(CompilerGeneratedAttribute), inherit: true))
+            {
+                return false;
+            }
+
+            return typeInfo.IsPublic || typeInfo.IsNestedPublic;
         }
 
-        if (typeInfo.IsDefined(typeof(CompilerGeneratedAttribute), inherit: true))
+        /// <summary>
+        /// Determine whenever the provided type has attribute.
+        /// </summary>
+        /// <param name="attribute">The type of attribute to check.</param>
+        /// <returns><c>true</c> if type has provided attribute, otherwise <c>false</c>.</returns>
+        public bool HasAttribute(Type attribute) =>
+            type.GetTypeInfo().IsDefined(attribute, inherit: true);
+
+        /// <summary>
+        /// Creates generic instance of the <paramref name="type"/>.
+        /// </summary>
+        /// <param name="typeArguments">The generic type arguments.</param>
+        /// <param name="instanceArgs">The arguments provided to create an instance.</param>
+        /// <returns>Created instance.</returns>
+        public object MakeGenericInstance(Type[] typeArguments, params object[] instanceArgs)
         {
-            return false;
+            var instanceType = type.MakeGenericType(typeArguments);
+            return Activator.CreateInstance(instanceType, instanceArgs);
         }
-
-        return typeInfo.IsPublic || typeInfo.IsNestedPublic;
-    }
-
-    /// <summary>
-    /// Determine whenever the provided type has attribute.
-    /// </summary>
-    /// <param name="type">The type to check.</param>
-    /// <param name="attribute">The type of attribute to check.</param>
-    /// <returns><c>true</c> if type has provided attribute, otherwise <c>false</c>.</returns>
-    public static bool HasAttribute(this Type type, Type attribute) =>
-        type.GetTypeInfo().IsDefined(attribute, inherit: true);
-
-    /// <summary>
-    /// Creates generic instance of the <paramref name="genericInstanceType"/>.
-    /// </summary>
-    /// <param name="genericInstanceType">The generic type to create.</param>
-    /// <param name="typeArguments">The generic type arguments.</param>
-    /// <param name="instanceArgs">The arguments provided to create instance.</param>
-    /// <returns>Created generic instance.</returns>
-    public static object MakeGenericInstance(
-        this Type genericInstanceType,
-        Type[] typeArguments,
-        params object[] instanceArgs)
-    {
-        var instanceType = genericInstanceType.MakeGenericType(typeArguments);
-        return Activator.CreateInstance(instanceType, instanceArgs);
     }
 }

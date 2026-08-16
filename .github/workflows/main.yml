@@ -45,15 +45,14 @@ jobs:
         shell: bash
 
       - name: 📥 setup nuGet
-        uses: NuGet/setup-nuget@v1.0.6
+        uses: NuGet/setup-nuget@v4.0
 
-      - name: 📥 Setup .NET 3.1 & 6.0 & 7.0
+      - name: 📥 setup .NET 8.0 & 10.0
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: |
-            3.1.x
-            6.0.x
-            7.0.x
+            8.0.x
+            10.0.x
 
       - name: 🔄 restore dependencies
         run: nuget restore $SOLUTION
