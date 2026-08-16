@@ -20,6 +20,15 @@ public static class ConfigLocator
     {
         /// <summary>
         /// Register all options classes with <see cref="ConfigLocationAttribute"/>
+        /// attribute from the calling assembly.
+        /// </summary>
+        /// <param name="configuration">The <see cref="IConfiguration"/> to read from.</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        public IServiceCollection AddConfigLocator(IConfiguration configuration) =>
+            services.AddConfigLocator(configuration, new[] { Assembly.GetCallingAssembly() });
+
+        /// <summary>
+        /// Register all options classes with <see cref="ConfigLocationAttribute"/>
         /// attribute from provided <paramref name="assemblies"/>.
         /// </summary>
         /// <param name="configuration">The <see cref="IConfiguration"/> to read from.</param>
@@ -32,63 +41,49 @@ public static class ConfigLocator
         {
             services.AddOptions();
 
-            foreach (var type in assemblies.TypesWithAttribute<ConfigLocationAttribute>())
+            foreach (var type in assemblies.GetDefinedTypes())
             {
-                services.AddConfigurationOf(configuration, type);
-            }
+                var location = type.GetCustomAttribute<ConfigLocationAttribute>();
+                if (location is not null)
+                {
+                    services.AddConfigurationOf(configuration, type, location);
+                }
 
-            foreach (var type in assemblies.TypesWithAttribute<ConfigValidateAttribute>())
-            {
-                services.AddDataAnnotationValidateOptions(type);
-                services.AddCustomValidateOf(type);
+                var validate = type.GetCustomAttribute<ConfigValidateAttribute>();
+                if (validate is not null)
+                {
+                    services.AddDataAnnotationValidateOptions(type);
+                    services.AddCustomValidateOf(type, validate);
+                }
             }
 
             return services;
         }
 
-        private void AddConfigurationOf(IConfiguration configuration, Type type)
+        private void AddConfigurationOf(IConfiguration configuration, Type type, ConfigLocationAttribute attribute)
         {
-            var attribute = GetCustomAttribute<ConfigLocationAttribute>(type);
             var section = configuration.GetSection(attribute.SectionKey);
-            var types = type.WithAdditionalTypesOf(attribute);
+            var types = type.WithAdditionalTypesOf(attribute).ToArray();
 
-            services.Configure(section, types.ToArray());
+            services.Configure(section, types);
         }
 
-        private void AddCustomValidateOf(Type type)
+        private void AddCustomValidateOf(Type type, ConfigValidateAttribute attribute)
         {
-            var attribute = GetCustomAttribute<ConfigValidateAttribute>(type);
-
             services.AddCustomValidateOptions(type, attribute.Validators);
         }
     }
-
-    private static T GetCustomAttribute<T>(Type type)
-        where T : Attribute =>
-        type.GetCustomAttribute<T>() ?? throw new AttributeLoadException<T>(type);
 
     private static IEnumerable<Type> WithAdditionalTypesOf(this Type type, ConfigLocationAttribute attribute)
     {
         yield return type;
 
-        foreach (var additionalType in attribute.AdditionalTypes ?? Type.EmptyTypes)
+        if (attribute.AdditionalTypes is not null)
         {
-            yield return additionalType;
+            foreach (var additionalType in attribute.AdditionalTypes)
+            {
+                yield return additionalType;
+            }
         }
-    }
-}
-
-/// <summary>
-/// Configuration validation attribute with validator type.
-/// </summary>
-/// <typeparam name="TValidator">The type of the custom validator.</typeparam>
-public class ConfigValidateAttribute<TValidator> : ConfigValidateAttribute
-{
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ConfigValidateAttribute{T}"/> class.
-    /// </summary>
-    public ConfigValidateAttribute()
-    {
-        Validators = [typeof(TValidator)];
     }
 }

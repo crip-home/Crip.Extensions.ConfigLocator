@@ -14,6 +14,13 @@ public static class AssemblyExtensions
     extension(IEnumerable<Assembly> assemblies)
     {
         /// <summary>
+        /// Get all non-abstract class types from provided assemblies.
+        /// </summary>
+        /// <returns>The collection of all non-abstract class types.</returns>
+        public IEnumerable<Type> GetDefinedTypes() =>
+            assemblies.SelectMany(assembly => assembly.GetDefinedTypes());
+
+        /// <summary>
         /// Get all <see cref="Type"/> instances with defined <typeparamref name="TAttribute"/> on them.
         /// </summary>
         /// <typeparam name="TAttribute">The type of attribute to search for.</typeparam>
@@ -35,6 +42,13 @@ public static class AssemblyExtensions
     extension(Assembly assembly)
     {
         /// <summary>
+        /// Get all non-abstract class types from provided assembly.
+        /// </summary>
+        /// <returns>The collection of all non-abstract class types.</returns>
+        public IEnumerable<Type> GetDefinedTypes() =>
+            assembly.GetTypes().Where(type => type.IsNonAbstractClass());
+
+        /// <summary>
         /// Get all <see cref="Type"/> instances with defined <typeparamref name="TAttribute"/> on them.
         /// </summary>
         /// <typeparam name="TAttribute">The type of attribute to search for.</typeparam>
@@ -49,10 +63,7 @@ public static class AssemblyExtensions
         /// <param name="attributeType">The type of attribute to search for.</param>
         /// <returns>The collection of all types with <paramref name="attributeType"/> attribute.</returns>
         public IEnumerable<Type> TypesWithAttribute(Type attributeType) =>
-            assembly.DefinedTypes
-                .Select(info => info.AsType())
-                .Where(type =>
-                    type.IsNonAbstractClass() &&
-                    type.HasAttribute(attributeType));
+            assembly.GetDefinedTypes()
+                .Where(type => type.HasAttribute(attributeType));
     }
 }

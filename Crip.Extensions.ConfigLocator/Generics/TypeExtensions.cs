@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -28,27 +30,22 @@ public static class TypeExtensions
         /// Determine is the provided type is not abstract.
         /// </summary>
         /// <returns><c>true</c> if type is not abstract, otherwise <c>false</c>.</returns>
-        public bool IsNonAbstractClass()
-        {
-            var typeInfo = type.GetTypeInfo();
+        public bool IsNonAbstractClass() =>
+            !type.IsSpecialName &&
+            !type.IsGenericTypeDefinition &&
+            !type.IsInterface &&
+            type.IsClass &&
+            !type.IsAbstract &&
+            !type.IsDefined(typeof(CompilerGeneratedAttribute), inherit: true);
 
-            if (typeInfo.IsSpecialName)
-            {
-                return false;
-            }
-
-            if (!typeInfo.IsClass || typeInfo.IsAbstract)
-            {
-                return false;
-            }
-
-            if (typeInfo.IsDefined(typeof(CompilerGeneratedAttribute), inherit: true))
-            {
-                return false;
-            }
-
-            return typeInfo.IsPublic || typeInfo.IsNestedPublic;
-        }
+        /// <summary>
+        /// Determine whenever the provided type has attribute.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of attribute to check.</typeparam>
+        /// <returns><c>true</c> if type has provided attribute, otherwise <c>false</c>.</returns>
+        public bool HasAttribute<TAttribute>()
+            where TAttribute : Attribute =>
+            type.HasAttribute(typeof(TAttribute));
 
         /// <summary>
         /// Determine whenever the provided type has attribute.
@@ -56,7 +53,7 @@ public static class TypeExtensions
         /// <param name="attribute">The type of attribute to check.</param>
         /// <returns><c>true</c> if type has provided attribute, otherwise <c>false</c>.</returns>
         public bool HasAttribute(Type attribute) =>
-            type.GetTypeInfo().IsDefined(attribute, inherit: true);
+            type.IsDefined(attribute, inherit: true);
 
         /// <summary>
         /// Creates generic instance of the <paramref name="type"/>.
@@ -67,7 +64,21 @@ public static class TypeExtensions
         public object MakeGenericInstance(Type[] typeArguments, params object[] instanceArgs)
         {
             var instanceType = type.MakeGenericType(typeArguments);
-            return Activator.CreateInstance(instanceType, instanceArgs);
+            return Activator.CreateInstance(instanceType, instanceArgs) ??
+                throw new InvalidOperationException($"Failed to create instance of {instanceType.FullName}");
         }
+    }
+
+    /// <param name="types">The collection of types to filter.</param>
+    extension(IEnumerable<Type> types)
+    {
+        /// <summary>
+        /// Filter collection of types by attribute.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of attribute to check.</typeparam>
+        /// <returns>The collection of types with provided attribute.</returns>
+        public IEnumerable<Type> WithAttribute<TAttribute>()
+            where TAttribute : Attribute =>
+            types.Where(type => type.HasAttribute<TAttribute>());
     }
 }

@@ -18,10 +18,12 @@ public class TypeExtensionsShould
     [InlineData(typeof(PublicClass), true)]
     [InlineData(typeof(AnotherPublicClass), true)]
     [InlineData(typeof(AbstractClass), false)]
-    [InlineData(typeof(Generic<int>), false)]
+    [InlineData(typeof(Generic<int>), true)]
+    [InlineData(typeof(Generic<>), false)]
     [InlineData(typeof(SomeStruct), false)]
     [InlineData(typeof(CompilerGenerated), false)]
     [InlineData(typeof(SpecialNameClass), false)]
+    [InlineData(typeof(NonGeneric), true)]
     public void IsNonAbstractClass(Type type, bool isNonAbstract)
     {
         type.IsNonAbstractClass().Should().Be(isNonAbstract);

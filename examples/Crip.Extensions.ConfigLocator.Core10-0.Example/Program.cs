@@ -1,5 +1,5 @@
-using Crip.Extensions.ConfigLocator;
-using Crip.Extensions.ConfigLocator.Core80.Example.Configuration;
+﻿using Crip.Extensions.ConfigLocator;
+using Crip.Extensions.ConfigLocator.Core100.Example.Configuration;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);

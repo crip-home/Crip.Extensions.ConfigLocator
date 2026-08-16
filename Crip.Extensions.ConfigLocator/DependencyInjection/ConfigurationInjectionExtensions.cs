@@ -33,8 +33,8 @@ public static class ConfigurationInjectionExtensions
         /// <param name="optionsType">The type of options being configured.</param>
         public void Configure(IConfigurationSection section, Type optionsType)
         {
-            services.Add(GenericOptionsChangeToken(section, optionsType));
-            services.Add(GenericConfigureOptions(section, optionsType));
+            services.Add(section.GenericOptionsChangeToken(optionsType));
+            services.Add(section.GenericConfigureOptions(optionsType));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ public static class ConfigurationInjectionExtensions
         /// </summary>
         /// <param name="optionsType">The type of options being configured.</param>
         public void AddDataAnnotationValidateOptions(Type optionsType) =>
-            services.Add(GenericDataAnnotationValidateOptions(optionsType));
+            services.Add(optionsType.GenericDataAnnotationValidateOptions());
 
         /// <summary>
         /// Registers custom option validation instance for <paramref name="optionsType"/> type.
@@ -59,7 +59,7 @@ public static class ConfigurationInjectionExtensions
     }
 
     private static ServiceDescriptor GenericOptionsChangeToken(
-        IConfigurationSection section,
+        this IConfigurationSection section,
         params Type[] typeArguments)
     {
         var serviceType = typeArguments[0].GenericOptionsChangeTokenType();
@@ -69,7 +69,7 @@ public static class ConfigurationInjectionExtensions
     }
 
     private static ServiceDescriptor GenericConfigureOptions(
-        IConfigurationSection section,
+        this IConfigurationSection section,
         params Type[] typeArguments)
     {
         var serviceType = typeArguments[0].GenericConfigureOptionsType();
@@ -78,8 +78,9 @@ public static class ConfigurationInjectionExtensions
         return new ServiceDescriptor(serviceType, instance);
     }
 
-    private static ServiceDescriptor GenericDataAnnotationValidateOptions(params Type[] typeArguments)
+    private static ServiceDescriptor GenericDataAnnotationValidateOptions(this Type optionsType)
     {
+        var typeArguments = new[] { optionsType };
         var serviceType = typeArguments[0].GenericValidateOptionsType();
         var instance = OptionsExtensions.GenericDataAnnotationValidateOptionsInstance(typeArguments);
 

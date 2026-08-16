@@ -1,142 +1,167 @@
-# Configuration locator
+# ConfigLocator
 
-![issues](https://img.shields.io/github/issues/crip-home/Crip.Extensions.ConfigLocator?style=for-the-badge&logo=appveyor)
-![forks](https://img.shields.io/github/forks/crip-home/Crip.Extensions.ConfigLocator?style=for-the-badge&logo=appveyor)
-![stars](https://img.shields.io/github/stars/crip-home/Crip.Extensions.ConfigLocator?style=for-the-badge&logo=appveyor)
-![license](https://img.shields.io/github/license/crip-home/Crip.Extensions.ConfigLocator?style=for-the-badge&logo=appveyor)
+![NuGet Version](https://img.shields.io/nuget/v/Crip.Extensions.ConfigLocator?style=for-the-badge&logo=nuget)
+![license](https://img.shields.io/github/license/crip-home/Crip.Extensions.ConfigLocator?style=for-the-badge)
 
-ASP.NET Core bring cool feature like options pattern but did you feel sometimes that is difficult to trace from which
-section in `appsettings.json` file this options come from?
+`Crip.Extensions.ConfigLocator` is a lightweight library for ASP.NET Core that automates the discovery and registration of configuration classes into the Dependency Injection (DI) container. 
 
-To reduce need register each options class separately and better traceability, this library does that automatically.
+Tired of manually adding `services.Configure<TOptions>(...)` for every single options class? `ConfigLocator` handles it for you using simple attributes, keeping your `Program.cs` clean and your configuration organized.
+
+## 🚀 Key Features
+
+- **Auto-Discovery**: Automatically scans assemblies for configuration classes.
+- **Attribute-Based**: Link classes to configuration sections directly in the class definition.
+- **Validation Support**: Built-in support for Data Annotations and custom `IValidateOptions<T>` validators.
+- **Generic Attributes**: Clean syntax for custom validators (C# 11+).
+- **Multiple Types**: Bind multiple types to the same configuration section effortlessly.
+- **Lean & Fast**: Optimized assembly scanning during startup.
 
 ---
 
-## Getting started
+## 🛠️ Getting Started
 
-### Installation
+### 1. Installation
 
-Install [Crip.Extensions.ConfigLocator NuGet package](https://www.nuget.org/packages/Crip.Extensions.ConfigLocator),
-or [GitHub package](https://github.com/orgs/crip-home/packages?repo_name=Crip.Extensions.ConfigLocator)
+Install the package via NuGet:
 
-### Prerequisites
+```bash
+dotnet add package Crip.Extensions.ConfigLocator
+```
 
-Register all options providing assemblies where to search for classes with `ConfigLocation` or `ConfigValidate`
-attributes.
+### 2. Setup
+
+In your `Program.cs`, register the configuration locator. By default, it scans the calling assembly:
 
 ```csharp
 using Crip.Extensions.ConfigLocator;
 
-builder.Services.AddConfigLocator(builder.Configuration, typeof(Program).Assembly);
+var builder = WebApplication.CreateBuilder(args);
+
+// Register all options from the calling assembly
+builder.Services.AddConfigLocator(builder.Configuration);
+
+// Or specify assemblies to scan
+builder.Services.AddConfigLocator(builder.Configuration, typeof(MyOptions).Assembly);
 ```
 
 ---
 
-## Usage
+## 📖 Usage
 
-Decorate options with `ConfigLocation` attribute:
+### 1. Decorate your Options class
+
+Use the `[ConfigLocation]` attribute to specify the configuration section key.
 
 ```csharp
 using Crip.Extensions.ConfigLocator;
 
-[ConfigLocation("Path:To:Configuration:Section")]
-public class MyOptions
+[ConfigLocation("ExternalServices:GitHub")]
+public class GitHubOptions
 {
-    public string Property { get; set; }
+    public string ApiKey { get; set; } = string.Empty;
+    public int TimeoutSeconds { get; set; } = 30;
 }
 ```
 
-Obtain options within DI container:
+This class will automatically bind to the following in your `appsettings.json`:
 
-```csharp
-public class MyController
+```json
 {
-    public MyController(
-        IOptions<MyOptions> singleton,
-        IOptionsSnapshot<TOptions> snapshot,
-        IOptionsMonitor<TOptions> monitor)
-    {
-        //...
+  "ExternalServices": {
+    "GitHub": {
+      "ApiKey": "your-api-key",
+      "TimeoutSeconds": 60
     }
+  }
+}
+```
+
+### 2. Inject and Use
+
+Inject these options anywhere using standard ASP.NET Core interfaces (`IOptions<T>`, `IOptionsSnapshot<T>`, or `IOptionsMonitor<T>`).
+
+```csharp
+public class GitHubService(IOptions<GitHubOptions> options)
+{
+    private readonly GitHubOptions _options = options.Value;
+
+    public void DoSomething() => Console.WriteLine(_options.ApiKey);
 }
 ```
 
 ---
 
-## Validation
+## ✅ Validation
 
-Option pattern supports multiple validation options. More about
-[Options validation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options#options-validation).
+The library seamlessly integrates with ASP.NET Core options validation.
 
-### Data annotation validation
+### Data Annotation Validation
 
-Define options with data annotation validation:
+Add the `[ConfigValidate]` attribute and use standard `System.ComponentModel.DataAnnotations`:
 
 ```csharp
-using Crip.Extensions.ConfigLocator;
-using System.ComponentModel.DataAnnotations;
-
 [ConfigLocation("MySection")]
-[ConfigValidate]
+[ConfigValidate] // Enables Data Annotation validation
 public class MyOptions
 {
-    [Required]
-    public string Foo { get; set; } = null!;
+    [Required, MinLength(5)]
+    public string ApiKey { get; set; } = null!;
 }
 ```
 
-When `MySection:Foo` is `null` in `appsettings.json` file, application will throw exception:
+### Custom Validators
 
-```text
-Microsoft.Extensions.Options.OptionsValidationException:
- DataAnnotation validation failed for 'AttributeOptions' members: 'Foo' with the error: 'The Property field is required.'.
-```
-
-### Custom option validator
-
-Define custom validator and register configuration with it:
+For complex logic, provide a custom `IValidateOptions<T>` implementation:
 
 ```csharp
 public class MyOptionsValidator : IValidateOptions<MyOptions>
 {
     public ValidateOptionsResult Validate(string? name, MyOptions options)
     {
-        if (options.Foo == "Bar")
-            return ValidateOptionsResult.Fail("Options 'Foo' value cannot be an 'Bar'");
+        if (options.ApiKey == "default")
+            return ValidateOptionsResult.Fail("API Key cannot be 'default'");
 
         return ValidateOptionsResult.Success;
     }
 }
 
+// C# 11+ generic attribute syntax
 [ConfigLocation("MySection")]
-[ConfigValidate<MyOptionsValidator>]
-// if you under C# 11 or you like to provide more than one validator:
-// [ConfigValidate(typeof(MyOptionsValidator))]
+[ConfigValidate<MyOptionsValidator>] 
 public class MyOptions
 {
-    public string Foo { get; set; } = null!;
+    public string ApiKey { get; set; } = null!;
+}
+
+// For older C# versions, use: [ConfigValidate(typeof(MyOptionsValidator))]
+```
+
+---
+
+## 🧩 Advanced Features
+
+### Multiple Types from Same Section
+
+You can bind multiple types to the same configuration section using a single attribute:
+
+```csharp
+[ConfigLocation("ServiceSettings", typeof(AdditionalOptions))]
+public class MainOptions
+{
+    // ...
 }
 ```
 
-When `MySection:Foo` is `Bar` in `appsettings.json` file, application will throw exception:
+---
 
-```text
-Microsoft.Extensions.Options.OptionsValidationException:
- Options 'Foo' value cannot be an 'Bar'
-```
+## ⚠️ Limitations
 
-### Options as validatable object
-
-As an addition your options class may implement `IValidatableObject` interface for some custom inline validation.
+- **Named Options**: Currently not supported (uses `Options.DefaultName`).
+- **Visibility**: Scans for **non-abstract** classes. Supports `public`, `internal`, and `nested` classes.
+- **Constructors**: Requires a public parameterless constructor for binding (standard ASP.NET Core requirement).
 
 ---
 
-## Additional documentation
+## 🔗 Additional Resources
 
-- [Options pattern in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options)
-
----
-
-## Limitations
-
-> This package does not support named options.
+- [Options pattern in ASP.NET Core (Official Docs)](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options)

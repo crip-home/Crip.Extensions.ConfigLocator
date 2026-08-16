@@ -39,6 +39,15 @@ public class ConfigLocatorShould
         _services.ContainsSingletonService<IValidateOptions<BarOptions>, Bar2OptionValidator>();
     }
 
+    [Fact]
+    public void AddConfigLocator_OverloadRegistersCallingAssembly()
+    {
+        _services.Object.AddConfigLocator(_configuration);
+        _services
+            .ContainsSingletonService<IConfigureOptions<MyOptions>,
+                NamedConfigureFromConfigurationOptions<MyOptions>>();
+    }
+
     [ConfigLocation("MyOptions", typeof(MyOtherOptions))]
     [ConfigValidate]
     public record MyOptions(string Foo = "") : MyOtherOptions(Foo);
