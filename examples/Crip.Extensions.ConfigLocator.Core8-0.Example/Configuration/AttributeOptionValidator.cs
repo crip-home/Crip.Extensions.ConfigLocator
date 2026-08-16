@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 
-namespace Crip.Extensions.ConfigLocator.Core60.Example.Configuration;
+namespace Crip.Extensions.ConfigLocator.Core80.Example.Configuration;
 
 public class AttributeOptionValidator : IValidateOptions<AttributeOptions>
 {

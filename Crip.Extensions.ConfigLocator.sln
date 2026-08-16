@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crip.Extensions.ConfigLocat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{0CA0AE06-B1C5-4B90-82D1-7C8D821A6BAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crip.Extensions.ConfigLocator.Core60.Example", "examples\Crip.Extensions.ConfigLocator.Core60.Example\Crip.Extensions.ConfigLocator.Core60.Example.csproj", "{3C9E3D82-A1AB-4892-9FDE-595068B8EC3D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crip.Extensions.ConfigLocator.Core8-0.Example", "examples\Crip.Extensions.ConfigLocator.Core8-0.Example\Crip.Extensions.ConfigLocator.Core8-0.Example.csproj", "{3C9E3D82-A1AB-4892-9FDE-595068B8EC3D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8325012E-68E1-48F3-934B-53A393E8BBDB}"
 	ProjectSection(SolutionItems) = preProject

@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "Crip.Extensions.ConfigLocator.Core60.Example": {
+    "https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

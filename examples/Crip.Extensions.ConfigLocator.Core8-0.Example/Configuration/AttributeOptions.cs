@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Crip.Extensions.ConfigLocator.Core60.Example.Configuration;
+namespace Crip.Extensions.ConfigLocator.Core80.Example.Configuration;
 
 [ConfigLocation("FromAttribute")]
 [ConfigValidate<AttributeOptionValidator>]
