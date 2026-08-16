@@ -44,9 +44,6 @@ jobs:
           echo $BUILD_VERSION
         shell: bash
 
-      - name: 📥 setup nuGet
-        uses: NuGet/setup-nuget@v4.0
-
       - name: 📥 setup .NET 8.0 & 10.0
         uses: actions/setup-dotnet@v2
         with:
@@ -55,7 +52,7 @@ jobs:
             10.0.x
 
       - name: 🔄 restore dependencies
-        run: nuget restore $SOLUTION
+        run: dotnet restore $SOLUTION
 
       - name: 🛠️ build
         run: dotnet build $LIBRARY -c $BUILD_CONFIG -p:Version=$BUILD_VERSION --no-restore -v m
