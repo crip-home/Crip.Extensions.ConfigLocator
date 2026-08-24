@@ -38,6 +38,17 @@ public class OptionsExtensionsShould
     }
 
     [Fact]
+    public void GenericOptionsChangeTokenInstance_WithName_SetsName()
+    {
+        const string name = "tenant";
+        var configurationSection = _configuration.GetSection(SectionKey);
+        var instance = (ConfigurationChangeTokenSource<PublicClass>)configurationSection
+            .GenericOptionsChangeTokenInstance(name, [typeof(PublicClass)]);
+
+        instance.Name.Should().Be(name);
+    }
+
+    [Fact]
     public void GenericConfigureOptionsType_CreatesGenericType()
     {
         typeof(PublicClass).GenericConfigureOptionsType()
@@ -54,6 +65,17 @@ public class OptionsExtensionsShould
 
         instance.Should().NotBeNull()
             .And.BeOfType<NamedConfigureFromConfigurationOptions<PublicClass>>();
+    }
+
+    [Fact]
+    public void GenericConfigureOptionsInstance_WithName_SetsName()
+    {
+        const string name = "tenant";
+        var configurationSection = _configuration.GetSection(SectionKey);
+        var instance = (NamedConfigureFromConfigurationOptions<PublicClass>)configurationSection
+        .GenericConfigureOptionsInstance(name, [typeof(PublicClass)]);
+
+        instance.Name.Should().Be(name);
     }
 
     private static IConfiguration GetConfiguration() =>

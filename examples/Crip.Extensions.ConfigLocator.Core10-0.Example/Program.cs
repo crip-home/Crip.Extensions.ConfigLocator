@@ -15,7 +15,16 @@ builder.Services.AddSingleton<IValidateOptions<ManualOptions>, ManualOptionValid
 
 var app = builder.Build();
 
-app.MapGet("/", (IOptionsSnapshot<AttributeOptions> attribute, IOptionsSnapshot<ManualOptions> configuration) =>
-    Results.Json(new { Attribute = attribute.Value, Configuration = configuration.Value }));
+app.MapGet("/", (
+    IOptionsSnapshot<AttributeOptions> attribute,
+    IOptionsSnapshot<ManualOptions> configuration,
+    IOptionsMonitor<NamedOptions> named
+) => Results.Json(new Dictionary<string, object>
+{
+    ["attribute"] = attribute.Value,
+    ["configuration"] = configuration.Value,
+    ["named-europe"] = named.Get("europe"),
+    ["named-america"] = named.Get("america"),
+}));
 
 app.Run();

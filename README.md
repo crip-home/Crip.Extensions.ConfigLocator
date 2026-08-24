@@ -132,9 +132,34 @@ public class MainOptions
 
 ---
 
+## Named options
+
+You can register the same options class more than once by giving each registration a name:
+
+```csharp
+[ConfigLocation("GitHub:Default")]
+[ConfigLocation("GitHub:Tenants:Europe", "europe")]
+[ConfigLocation("GitHub:Tenants:Us", "us")]
+public class GitHubOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+}
+```
+
+Then resolve a specific named instance:
+
+```csharp
+public class GitHubClient(IOptionsMonitor<GitHubOptions> options)
+{
+    private readonly GitHubOptions _europe = options.Get("europe");
+    private readonly GitHubOptions _us = options.Get("us");
+}
+```
+
+---
+
 ## Limitations
 
-- Named options are not supported
 - Only non-abstract classes are scanned
 - Binding requires a public parameterless constructor
 

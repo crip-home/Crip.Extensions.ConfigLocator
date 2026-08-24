@@ -3,6 +3,7 @@ using System.Linq;
 using Crip.Extensions.ConfigLocator.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Crip.Extensions.ConfigLocator.DependencyInjection;
 
@@ -21,12 +22,24 @@ public static class ConfigurationInjectionExtensions
         /// <param name="optionTypes">The types of options being configured.</param>
         public void Configure(IConfigurationSection section, params Type[]? optionTypes)
         {
+            services.Configure(section, Options.DefaultName, optionTypes);
+        }
+
+        /// <summary>
+        /// Registers a named configuration instance which <paramref name="optionTypes"/> will bind against.
+        /// </summary>
+        /// <param name="section">The configuration being bound.</param>
+        /// <param name="name">The options instance name.</param>
+        /// <param name="optionTypes">The types of options being configured.</param>
+        public void Configure(IConfigurationSection section, string name, params Type[]? optionTypes)
+        {
             ValidateSection(section);
+            name = ValidateName(name);
             optionTypes = ValidateOptionTypes(optionTypes);
 
             foreach (var type in optionTypes)
             {
-                services.Configure(section, type);
+                services.Configure(section, name, type);
             }
         }
 
@@ -37,11 +50,23 @@ public static class ConfigurationInjectionExtensions
         /// <param name="optionsType">The type of options being configured.</param>
         public void Configure(IConfigurationSection section, Type optionsType)
         {
+            services.Configure(section, Options.DefaultName, optionsType);
+        }
+
+        /// <summary>
+        /// Registers a named configuration instance which <paramref name="optionsType"/> will bind against.
+        /// </summary>
+        /// <param name="section">The configuration being bound.</param>
+        /// <param name="name">The options instance name.</param>
+        /// <param name="optionsType">The type of options being configured.</param>
+        public void Configure(IConfigurationSection section, string name, Type optionsType)
+        {
             ValidateSection(section);
+            name = ValidateName(name);
             ValidateOptionType(optionsType);
 
-            services.Add(section.GenericOptionsChangeToken(optionsType));
-            services.Add(section.GenericConfigureOptions(optionsType));
+            services.Add(section.GenericOptionsChangeToken(name, optionsType));
+            services.Add(section.GenericConfigureOptions(name, optionsType));
         }
 
         /// <summary>
@@ -50,8 +75,34 @@ public static class ConfigurationInjectionExtensions
         /// <param name="optionsType">The type of options being configured.</param>
         public void AddDataAnnotationValidateOptions(Type optionsType)
         {
+            services.AddDataAnnotationValidateOptions(optionsType, Options.DefaultName);
+        }
+
+        /// <summary>
+        /// Registers named data annotation option validation instance for <paramref name="optionsType"/> type.
+        /// </summary>
+        /// <param name="optionsType">The type of options being configured.</param>
+        /// <param name="name">The options instance name.</param>
+        public void AddDataAnnotationValidateOptions(Type optionsType, string name)
+        {
             ValidateOptionType(optionsType);
-            services.Add(optionsType.GenericDataAnnotationValidateOptions());
+            services.Add(optionsType.GenericDataAnnotationValidateOptions(name));
+        }
+
+        /// <summary>
+        /// Registers named data annotation option validation instances for <paramref name="optionsType"/> type.
+        /// </summary>
+        /// <param name="optionsType">The type of options being configured.</param>
+        /// <param name="names">The options instance names.</param>
+        public void AddDataAnnotationValidateOptions(Type optionsType, params string[]? names)
+        {
+            ValidateOptionType(optionsType);
+            names = ValidateNames(names);
+
+            foreach (var name in names)
+            {
+                services.AddDataAnnotationValidateOptions(optionsType, name);
+            }
         }
 
         /// <summary>
@@ -73,29 +124,31 @@ public static class ConfigurationInjectionExtensions
 
     private static ServiceDescriptor GenericOptionsChangeToken(
         this IConfigurationSection section,
+        string name,
         params Type[] typeArguments)
     {
         var serviceType = typeArguments[0].GenericOptionsChangeTokenType();
-        var instance = section.GenericOptionsChangeTokenInstance(typeArguments);
+        var instance = section.GenericOptionsChangeTokenInstance(name, typeArguments);
 
         return new ServiceDescriptor(serviceType, instance);
     }
 
     private static ServiceDescriptor GenericConfigureOptions(
         this IConfigurationSection section,
+        string name,
         params Type[] typeArguments)
     {
         var serviceType = typeArguments[0].GenericConfigureOptionsType();
-        var instance = section.GenericConfigureOptionsInstance(typeArguments);
+        var instance = section.GenericConfigureOptionsInstance(name, typeArguments);
 
         return new ServiceDescriptor(serviceType, instance);
     }
 
-    private static ServiceDescriptor GenericDataAnnotationValidateOptions(this Type optionsType)
+    private static ServiceDescriptor GenericDataAnnotationValidateOptions(this Type optionsType, string name)
     {
         Type[] typeArguments = [optionsType];
         var serviceType = typeArguments[0].GenericValidateOptionsType();
-        var instance = OptionsExtensions.GenericDataAnnotationValidateOptionsInstance(typeArguments);
+        var instance = OptionsExtensions.GenericDataAnnotationValidateOptionsInstance(name, typeArguments);
 
         return new ServiceDescriptor(serviceType, instance);
     }
@@ -139,6 +192,36 @@ public static class ConfigurationInjectionExtensions
         }
 
         return optionTypes;
+    }
+
+    private static string ValidateName(string name)
+    {
+        if (name is null)
+        {
+            throw new ArgumentNullException(nameof(name));
+        }
+
+        if (name != Options.DefaultName && string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Options name cannot be blank.", nameof(name));
+        }
+
+        return name;
+    }
+
+    private static string[] ValidateNames(string[]? names)
+    {
+        if (names is null)
+        {
+            throw new ArgumentNullException(nameof(names));
+        }
+
+        if (names.Any(name => name is null))
+        {
+            throw new ArgumentException("Options names cannot contain null entries.", nameof(names));
+        }
+
+        return names.Select(ValidateName).ToArray();
     }
 
     private static Type[] ValidateValidatorTypes(Type[]? validatorTypes)

@@ -30,8 +30,18 @@ public static class OptionsExtensions
     /// <param name="typeArguments">The type of options type arguments.</param>
     /// <returns>Options with provided generic parameter.</returns>
     public static object GenericOptionsChangeTokenInstance(this IConfigurationSection section, Type[]? typeArguments) =>
+        section.GenericOptionsChangeTokenInstance(Options.DefaultName, typeArguments);
+
+    /// <summary>
+    /// Create <see cref="ConfigurationChangeTokenSource{T}"/> instance.
+    /// </summary>
+    /// <param name="section">The configuration section of the settings.</param>
+    /// <param name="name">The options instance name.</param>
+    /// <param name="typeArguments">The type of options type arguments.</param>
+    /// <returns>Options with provided generic parameter.</returns>
+    public static object GenericOptionsChangeTokenInstance(this IConfigurationSection section, string name, Type[]? typeArguments) =>
         typeof(ConfigurationChangeTokenSource<>)
-            .MakeGenericInstance(ValidateTypeArguments(typeArguments), [Options.DefaultName, ValidateSection(section)]);
+            .MakeGenericInstance(ValidateTypeArguments(typeArguments), [ValidateName(name), ValidateSection(section)]);
 
     /// <summary>
     /// Create <see cref="IConfigureOptions{T}"/> type.
@@ -56,8 +66,18 @@ public static class OptionsExtensions
     /// <param name="typeArguments">The type of options type arguments.</param>
     /// <returns>Options with provided generic parameter.</returns>
     public static object GenericConfigureOptionsInstance(this IConfigurationSection section, Type[]? typeArguments) =>
+        section.GenericConfigureOptionsInstance(Options.DefaultName, typeArguments);
+
+    /// <summary>
+    /// Create <see cref="NamedConfigureFromConfigurationOptions{T}"/> instance.
+    /// </summary>
+    /// <param name="section">The configuration section of the settings.</param>
+    /// <param name="name">The options instance name.</param>
+    /// <param name="typeArguments">The type of options type arguments.</param>
+    /// <returns>Options with provided generic parameter.</returns>
+    public static object GenericConfigureOptionsInstance(this IConfigurationSection section, string name, Type[]? typeArguments) =>
         typeof(NamedConfigureFromConfigurationOptions<>)
-            .MakeGenericInstance(ValidateTypeArguments(typeArguments), [Options.DefaultName, ValidateSection(section), ConfigureBinder]);
+            .MakeGenericInstance(ValidateTypeArguments(typeArguments), [ValidateName(name), ValidateSection(section), ConfigureBinder]);
 
     /// <summary>
     /// Create <see cref="DataAnnotationValidateOptions{T}"/> instance.
@@ -65,8 +85,17 @@ public static class OptionsExtensions
     /// <param name="typeArguments">The type of options type arguments.</param>
     /// <returns>Validate options with provided generic parameter.</returns>
     public static object GenericDataAnnotationValidateOptionsInstance(Type[]? typeArguments) =>
+        GenericDataAnnotationValidateOptionsInstance(Options.DefaultName, typeArguments);
+
+    /// <summary>
+    /// Create <see cref="DataAnnotationValidateOptions{T}"/> instance.
+    /// </summary>
+    /// <param name="name">The options instance name.</param>
+    /// <param name="typeArguments">The type of options type arguments.</param>
+    /// <returns>Validate options with provided generic parameter.</returns>
+    public static object GenericDataAnnotationValidateOptionsInstance(string name, Type[]? typeArguments) =>
         typeof(DataAnnotationValidateOptions<>)
-            .MakeGenericInstance(ValidateTypeArguments(typeArguments), [Options.DefaultName]);
+            .MakeGenericInstance(ValidateTypeArguments(typeArguments), [ValidateName(name)]);
 
     private static Type ValidateTypeArgument(Type typeArgument) =>
         typeArgument ?? throw new ArgumentNullException(nameof(typeArgument));
@@ -76,6 +105,21 @@ public static class OptionsExtensions
 
     private static IConfigurationSection ValidateSection(IConfigurationSection section) =>
         section ?? throw new ArgumentNullException(nameof(section));
+
+    private static string ValidateName(string name)
+    {
+        if (name is null)
+        {
+            throw new ArgumentNullException(nameof(name));
+        }
+
+        if (name != Options.DefaultName && string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Options name cannot be blank.", nameof(name));
+        }
+
+        return name;
+    }
 
     private static Type[] ValidateTypeArgumentsCore(Type[]? typeArguments)
     {

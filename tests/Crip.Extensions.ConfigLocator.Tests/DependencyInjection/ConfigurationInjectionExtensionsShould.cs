@@ -46,10 +46,28 @@ public class ConfigurationInjectionExtensionsShould
         _services.ContainsSingletonService<IConfigureOptions<MyOtherOptions>, NamedConfigureFromConfigurationOptions<MyOtherOptions>>();
     }
 
+    [Fact]
+    public void Configure_WithName_BindsNamedOptionsInstance()
+    {
+        var services = new ServiceCollection();
+        services.AddOptions();
+        services.Configure(GetSection(), "named", typeof(BindableOptions));
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var options = serviceProvider.GetRequiredService<IOptionsMonitor<BindableOptions>>();
+
+        options.Get("named").Foo.Should().Be("Value");
+    }
+
     private IConfigurationSection GetSection() =>
         _configuration.GetSection("MyOptions");
 
     public record MyOptions(string Foo = "default");
 
     public record MyOtherOptions(string Bar = "default");
+
+    public class BindableOptions
+    {
+        public string Foo { get; set; } = string.Empty;
+    }
 }

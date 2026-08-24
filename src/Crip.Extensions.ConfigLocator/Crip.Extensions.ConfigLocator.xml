@@ -49,6 +49,13 @@
             </summary>
             <param name="sectionKey">Application settings file section key.</param>
         </member>
+        <member name="M:Crip.Extensions.ConfigLocator.ConfigLocationAttribute.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Crip.Extensions.ConfigLocator.ConfigLocationAttribute"/> class.
+            </summary>
+            <param name="sectionKey">Application settings file section key.</param>
+            <param name="name">Options instance name.</param>
+        </member>
         <member name="M:Crip.Extensions.ConfigLocator.ConfigLocationAttribute.#ctor(System.String,System.Type[])">
             <summary>
             Initializes a new instance of the <see cref="T:Crip.Extensions.ConfigLocator.ConfigLocationAttribute"/> class.
@@ -56,9 +63,22 @@
             <param name="sectionKey">Application settings file section key.</param>
             <param name="additionalTypes">Additional option types to be registered with value from same section.</param>
         </member>
+        <member name="M:Crip.Extensions.ConfigLocator.ConfigLocationAttribute.#ctor(System.String,System.String,System.Type[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Crip.Extensions.ConfigLocator.ConfigLocationAttribute"/> class.
+            </summary>
+            <param name="sectionKey">Application settings file section key.</param>
+            <param name="name">Options instance name.</param>
+            <param name="additionalTypes">Additional option types to be registered with value from same section.</param>
+        </member>
         <member name="P:Crip.Extensions.ConfigLocator.ConfigLocationAttribute.AdditionalTypes">
             <summary>
             Gets additional option types to be registered with value from same section.
+            </summary>
+        </member>
+        <member name="P:Crip.Extensions.ConfigLocator.ConfigLocationAttribute.Name">
+            <summary>
+            Gets options instance name.
             </summary>
         </member>
         <member name="P:Crip.Extensions.ConfigLocator.ConfigLocationAttribute.SectionKey">
@@ -113,6 +133,15 @@
             <param name="typeArguments">The type of options type arguments.</param>
             <returns>Options with provided generic parameter.</returns>
         </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions.GenericOptionsChangeTokenInstance(Microsoft.Extensions.Configuration.IConfigurationSection,System.String,System.Type[])">
+            <summary>
+            Create <see cref="T:Microsoft.Extensions.Options.ConfigurationChangeTokenSource`1"/> instance.
+            </summary>
+            <param name="section">The configuration section of the settings.</param>
+            <param name="name">The options instance name.</param>
+            <param name="typeArguments">The type of options type arguments.</param>
+            <returns>Options with provided generic parameter.</returns>
+        </member>
         <member name="M:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions.GenericConfigureOptionsType(System.Type)">
             <summary>
             Create <see cref="T:Microsoft.Extensions.Options.IConfigureOptions`1"/> type.
@@ -135,10 +164,27 @@
             <param name="typeArguments">The type of options type arguments.</param>
             <returns>Options with provided generic parameter.</returns>
         </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions.GenericConfigureOptionsInstance(Microsoft.Extensions.Configuration.IConfigurationSection,System.String,System.Type[])">
+            <summary>
+            Create <see cref="T:Microsoft.Extensions.Options.NamedConfigureFromConfigurationOptions`1"/> instance.
+            </summary>
+            <param name="section">The configuration section of the settings.</param>
+            <param name="name">The options instance name.</param>
+            <param name="typeArguments">The type of options type arguments.</param>
+            <returns>Options with provided generic parameter.</returns>
+        </member>
         <member name="M:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions.GenericDataAnnotationValidateOptionsInstance(System.Type[])">
             <summary>
             Create <see cref="T:Microsoft.Extensions.Options.DataAnnotationValidateOptions`1"/> instance.
             </summary>
+            <param name="typeArguments">The type of options type arguments.</param>
+            <returns>Validate options with provided generic parameter.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions.GenericDataAnnotationValidateOptionsInstance(System.String,System.Type[])">
+            <summary>
+            Create <see cref="T:Microsoft.Extensions.Options.DataAnnotationValidateOptions`1"/> instance.
+            </summary>
+            <param name="name">The options instance name.</param>
             <param name="typeArguments">The type of options type arguments.</param>
             <returns>Validate options with provided generic parameter.</returns>
         </member>
@@ -150,11 +196,23 @@
         <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.Configure(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfigurationSection,System.Type[])">
             <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.Configure(Microsoft.Extensions.Configuration.IConfigurationSection,System.Type[])"/>
         </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.Configure(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfigurationSection,System.String,System.Type[])">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.Configure(Microsoft.Extensions.Configuration.IConfigurationSection,System.String,System.Type[])"/>
+        </member>
         <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.Configure(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfigurationSection,System.Type)">
             <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.Configure(Microsoft.Extensions.Configuration.IConfigurationSection,System.Type)"/>
         </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.Configure(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfigurationSection,System.String,System.Type)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.Configure(Microsoft.Extensions.Configuration.IConfigurationSection,System.String,System.Type)"/>
+        </member>
         <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.AddDataAnnotationValidateOptions(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Type)">
             <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddDataAnnotationValidateOptions(System.Type)"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.AddDataAnnotationValidateOptions(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Type,System.String)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddDataAnnotationValidateOptions(System.Type,System.String)"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.AddDataAnnotationValidateOptions(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Type,System.String[])">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddDataAnnotationValidateOptions(System.Type,System.String[])"/>
         </member>
         <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.AddCustomValidateOptions(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Type,System.Type[])">
             <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddCustomValidateOptions(System.Type,System.Type[])"/>
@@ -169,6 +227,14 @@
             <param name="section">The configuration being bound.</param>
             <param name="optionTypes">The types of options being configured.</param>
         </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.Configure(Microsoft.Extensions.Configuration.IConfigurationSection,System.String,System.Type[])">
+            <summary>
+            Registers a named configuration instance which <paramref name="optionTypes"/> will bind against.
+            </summary>
+            <param name="section">The configuration being bound.</param>
+            <param name="name">The options instance name.</param>
+            <param name="optionTypes">The types of options being configured.</param>
+        </member>
         <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.Configure(Microsoft.Extensions.Configuration.IConfigurationSection,System.Type)">
             <summary>
             Registers a configuration instance which <paramref name="optionsType"/> will bind against.
@@ -176,11 +242,33 @@
             <param name="section">The configuration being bound.</param>
             <param name="optionsType">The type of options being configured.</param>
         </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.Configure(Microsoft.Extensions.Configuration.IConfigurationSection,System.String,System.Type)">
+            <summary>
+            Registers a named configuration instance which <paramref name="optionsType"/> will bind against.
+            </summary>
+            <param name="section">The configuration being bound.</param>
+            <param name="name">The options instance name.</param>
+            <param name="optionsType">The type of options being configured.</param>
+        </member>
         <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddDataAnnotationValidateOptions(System.Type)">
             <summary>
             Registers data annotation option validation instance for <paramref name="optionsType"/> type.
             </summary>
             <param name="optionsType">The type of options being configured.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddDataAnnotationValidateOptions(System.Type,System.String)">
+            <summary>
+            Registers named data annotation option validation instance for <paramref name="optionsType"/> type.
+            </summary>
+            <param name="optionsType">The type of options being configured.</param>
+            <param name="name">The options instance name.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddDataAnnotationValidateOptions(System.Type,System.String[])">
+            <summary>
+            Registers named data annotation option validation instances for <paramref name="optionsType"/> type.
+            </summary>
+            <param name="optionsType">The type of options being configured.</param>
+            <param name="names">The options instance names.</param>
         </member>
         <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddCustomValidateOptions(System.Type,System.Type[])">
             <summary>

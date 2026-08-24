@@ -7,6 +7,7 @@ using Crip.Extensions.ConfigLocator.DependencyInjection;
 using Crip.Extensions.ConfigLocator.Generics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Crip.Extensions.ConfigLocator;
 
@@ -54,18 +55,18 @@ public static class ConfigLocator
 
             foreach (var type in assemblies.GetDefinedTypes().Distinct())
             {
-                var location = type.GetCustomAttribute<ConfigLocationAttribute>();
-                if (location is not null)
+                var locations = type.GetCustomAttributes<ConfigLocationAttribute>().ToArray();
+                foreach (var location in locations)
                 {
                     services.AddConfigurationOf(configuration, type, location);
                 }
 
                 var validate = type.GetCustomAttribute<ConfigValidateAttribute>();
-                if (validate is not null)
-                {
-                    services.AddDataAnnotationValidateOptions(type);
-                    services.AddCustomValidateOf(type, validate);
-                }
+                if (validate is null) continue;
+
+                var names = locations.Select(location => location.Name).DefaultIfEmpty(Options.DefaultName).ToArray();
+                services.AddDataAnnotationValidateOptions(type, names);
+                services.AddCustomValidateOf(type, validate);
             }
 
             return services;
@@ -76,7 +77,7 @@ public static class ConfigLocator
             var section = configuration.GetSection(attribute.SectionKey);
             var types = type.WithAdditionalTypesOf(attribute).Distinct().ToArray();
 
-            services.Configure(section, types);
+            services.Configure(section, attribute.Name, types);
         }
 
         private void AddCustomValidateOf(Type type, ConfigValidateAttribute attribute)

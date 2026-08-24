@@ -1,4 +1,7 @@
-﻿namespace Crip.Extensions.ConfigLocator.Tests;
+﻿using System.Reflection;
+using Microsoft.Extensions.Options;
+
+namespace Crip.Extensions.ConfigLocator.Tests;
 
 public class ConfigLocationAttributeShould
 {
@@ -10,6 +13,7 @@ public class ConfigLocationAttributeShould
         var subject = new ConfigLocationAttribute(sectionKey);
 
         subject.SectionKey.Should().Be(sectionKey);
+        subject.Name.Should().Be(Options.DefaultName);
     }
 
     [Fact]
@@ -21,10 +25,38 @@ public class ConfigLocationAttributeShould
         var subject = new ConfigLocationAttribute(sectionKey, types);
 
         subject.SectionKey.Should().Be(sectionKey);
+        subject.Name.Should().Be(Options.DefaultName);
         subject.AdditionalTypes.Should().BeEquivalentTo(types);
 
         types[0] = typeof(ConfigValidateAttributeShould);
         subject.AdditionalTypes.Should().BeEquivalentTo([typeof(ConfigLocationAttributeShould)]);
+    }
+
+    [Fact]
+    public void Constructor_WithName_ProperlySetsName()
+    {
+        const string sectionKey = "section";
+        const string name = "tenant";
+
+        var subject = new ConfigLocationAttribute(sectionKey, name);
+
+        subject.SectionKey.Should().Be(sectionKey);
+        subject.Name.Should().Be(name);
+        subject.AdditionalTypes.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Constructor_WithName_AndAdditionalTypes_ProperlySetsValues()
+    {
+        const string sectionKey = "section";
+        const string name = "tenant";
+        Type[] types = [typeof(ConfigLocationAttributeShould)];
+
+        var subject = new ConfigLocationAttribute(sectionKey, name, types);
+
+        subject.SectionKey.Should().Be(sectionKey);
+        subject.Name.Should().Be(name);
+        subject.AdditionalTypes.Should().BeEquivalentTo(types);
     }
 
     [Fact]
@@ -45,6 +77,16 @@ public class ConfigLocationAttributeShould
         act.Should().Throw<ArgumentException>();
     }
 
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void Constructor_WithName_ThrowsForInvalidName(string name)
+    {
+        Action act = () => new ConfigLocationAttribute("section", name);
+
+        act.Should().Throw<ArgumentException>();
+    }
+
     [Fact]
     public void Constructor_DefensivelyCopiesAdditionalTypes()
     {
@@ -55,5 +97,14 @@ public class ConfigLocationAttributeShould
         additionalTypes[0] = typeof(ConfigValidateAttributeShould);
 
         subject.AdditionalTypes.Should().BeEquivalentTo([typeof(ConfigLocationAttributeShould)]);
+    }
+
+    [Fact]
+    public void AttributeUsage_AllowsMultipleInstances()
+    {
+        var usage = typeof(ConfigLocationAttribute).GetCustomAttribute<AttributeUsageAttribute>();
+
+        usage.Should().NotBeNull();
+        usage!.AllowMultiple.Should().BeTrue();
     }
 }
