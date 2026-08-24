@@ -9,10 +9,11 @@ public class OptionsExtensionsShould
 {
     private const string SectionKey = "MyOptions";
 
-    private static readonly Dictionary<string, string> ConfigurationData = new()
-    {
-        { $"{SectionKey}:{nameof(PublicClass.SomeOption)}", "SomeOptionValue" },
-    };
+    private static readonly Dictionary<string, string?> ConfigurationData =
+        new()
+        {
+            { $"{SectionKey}:{nameof(PublicClass.SomeOption)}", "SomeOptionValue" },
+        };
 
     private readonly IConfiguration _configuration = GetConfiguration();
 
@@ -29,7 +30,7 @@ public class OptionsExtensionsShould
     {
         var configurationSection = _configuration.GetSection(SectionKey);
         var instance = configurationSection
-            .GenericOptionsChangeTokenInstance(new[] { typeof(PublicClass) });
+            .GenericOptionsChangeTokenInstance([typeof(PublicClass)]);
 
         instance
             .Should().NotBeNull()
@@ -49,7 +50,7 @@ public class OptionsExtensionsShould
     {
         var configurationSection = _configuration.GetSection(SectionKey);
         var instance = configurationSection
-            .GenericConfigureOptionsInstance(new[] { typeof(PublicClass) });
+            .GenericConfigureOptionsInstance([typeof(PublicClass)]);
 
         instance.Should().NotBeNull()
             .And.BeOfType<NamedConfigureFromConfigurationOptions<PublicClass>>();

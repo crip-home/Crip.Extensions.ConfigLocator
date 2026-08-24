@@ -18,7 +18,8 @@ public static class AssemblyExtensions
         /// </summary>
         /// <returns>The collection of all non-abstract class types.</returns>
         public IEnumerable<Type> GetDefinedTypes() =>
-            assemblies.SelectMany(assembly => assembly.GetDefinedTypes());
+            assemblies?.SelectMany(assembly => assembly.GetDefinedTypes())
+            ?? throw new ArgumentNullException(nameof(assemblies));
 
         /// <summary>
         /// Get all <see cref="Type"/> instances with defined <typeparamref name="TAttribute"/> on them.
@@ -27,7 +28,8 @@ public static class AssemblyExtensions
         /// <returns>The collection of all types with <typeparamref name="TAttribute"/> attribute.</returns>
         public IEnumerable<Type> TypesWithAttribute<TAttribute>()
             where TAttribute : Attribute =>
-            assemblies.SelectMany(assembly => assembly.TypesWithAttribute(typeof(TAttribute)));
+            assemblies?.SelectMany(assembly => assembly.TypesWithAttribute(typeof(TAttribute)))
+            ?? throw new ArgumentNullException(nameof(assemblies));
 
         /// <summary>
         /// Get all <see cref="Type"/> instances with defined <paramref name="attributeType"/> on them.
@@ -35,7 +37,8 @@ public static class AssemblyExtensions
         /// <param name="attributeType">The type of attribute to search for.</param>
         /// <returns>The collection of all types with <paramref name="attributeType"/> attribute.</returns>
         public IEnumerable<Type> TypesWithAttribute(Type attributeType) =>
-            assemblies.SelectMany(assembly => assembly.TypesWithAttribute(attributeType));
+            assemblies?.SelectMany(assembly => assembly.TypesWithAttribute(attributeType))
+            ?? throw new ArgumentNullException(nameof(assemblies));
     }
 
     /// <param name="assembly">The <see cref="Assembly"/> to search in.</param>
@@ -46,7 +49,9 @@ public static class AssemblyExtensions
         /// </summary>
         /// <returns>The collection of all non-abstract class types.</returns>
         public IEnumerable<Type> GetDefinedTypes() =>
-            assembly.GetTypes().Where(type => type.IsNonAbstractClass());
+            (assembly ?? throw new ArgumentNullException(nameof(assembly)))
+                .GetLoadableTypes()
+                .Where(type => type.IsNonAbstractClass());
 
         /// <summary>
         /// Get all <see cref="Type"/> instances with defined <typeparamref name="TAttribute"/> on them.
@@ -63,7 +68,20 @@ public static class AssemblyExtensions
         /// <param name="attributeType">The type of attribute to search for.</param>
         /// <returns>The collection of all types with <paramref name="attributeType"/> attribute.</returns>
         public IEnumerable<Type> TypesWithAttribute(Type attributeType) =>
-            assembly.GetDefinedTypes()
+            (assembly ?? throw new ArgumentNullException(nameof(assembly)))
+                .GetDefinedTypes()
                 .Where(type => type.HasAttribute(attributeType));
+    }
+
+    private static IEnumerable<Type> GetLoadableTypes(this Assembly assembly)
+    {
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            return ex.Types.Where(type => type is not null).Select(type => type!);
+        }
     }
 }

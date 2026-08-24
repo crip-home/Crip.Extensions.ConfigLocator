@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Crip.Extensions.ConfigLocator.Generics;
@@ -61,8 +60,12 @@ public static class TypeExtensions
         /// <param name="typeArguments">The generic type arguments.</param>
         /// <param name="instanceArgs">The arguments provided to create an instance.</param>
         /// <returns>Created instance.</returns>
-        public object MakeGenericInstance(Type[] typeArguments, params object[] instanceArgs)
+        public object MakeGenericInstance(Type[]? typeArguments, params object[]? instanceArgs)
         {
+            typeArguments = ValidateTypeArguments(typeArguments);
+            ValidateInstanceArguments(instanceArgs);
+            ValidateGenericType(type, typeArguments);
+
             var instanceType = type.MakeGenericType(typeArguments);
             return Activator.CreateInstance(instanceType, instanceArgs) ??
                 throw new InvalidOperationException($"Failed to create instance of {instanceType.FullName}");
@@ -80,5 +83,48 @@ public static class TypeExtensions
         public IEnumerable<Type> WithAttribute<TAttribute>()
             where TAttribute : Attribute =>
             types.Where(type => type.HasAttribute<TAttribute>());
+    }
+
+    private static void ValidateGenericType(Type type, Type[] typeArguments)
+    {
+        if (!type.IsGenericTypeDefinition)
+        {
+            throw new InvalidOperationException($"Type '{type.FullName}' is not a generic type definition.");
+        }
+
+        if (type.GetGenericArguments().Length != typeArguments.Length)
+        {
+            throw new ArgumentException(
+                $"Type '{type.FullName}' expects {type.GetGenericArguments().Length} generic type argument(s).",
+                nameof(typeArguments));
+        }
+    }
+
+    private static Type[] ValidateTypeArguments(Type[]? typeArguments)
+    {
+        if (typeArguments is null)
+        {
+            throw new ArgumentNullException(nameof(typeArguments));
+        }
+
+        if (typeArguments.Length == 0)
+        {
+            throw new ArgumentException("At least one generic type argument is required.", nameof(typeArguments));
+        }
+
+        if (typeArguments.Any(type => type is null))
+        {
+            throw new ArgumentException("Generic type arguments cannot contain null entries.", nameof(typeArguments));
+        }
+
+        return typeArguments;
+    }
+
+    private static void ValidateInstanceArguments(object[]? instanceArgs)
+    {
+        if (instanceArgs is null)
+        {
+            throw new ArgumentNullException(nameof(instanceArgs));
+        }
     }
 }

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Crip.Extensions.ConfigLocator.DependencyInjection;
-using Crip.Extensions.ConfigLocator.Exceptions;
 using Crip.Extensions.ConfigLocator.Generics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,8 +24,9 @@ public static class ConfigLocator
         /// </summary>
         /// <param name="configuration">The <see cref="IConfiguration"/> to read from.</param>
         /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public IServiceCollection AddConfigLocator(IConfiguration configuration) =>
-            services.AddConfigLocator(configuration, new[] { Assembly.GetCallingAssembly() });
+            services.AddConfigLocator(configuration, [Assembly.GetCallingAssembly()]);
 
         /// <summary>
         /// Register all options classes with <see cref="ConfigLocationAttribute"/>
@@ -37,11 +38,21 @@ public static class ConfigLocator
         /// <see cref="ConfigLocationAttribute"/> attribute.
         /// </param>
         /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-        public IServiceCollection AddConfigLocator(IConfiguration configuration, params Assembly[] assemblies)
+        public IServiceCollection AddConfigLocator(IConfiguration configuration, params Assembly[]? assemblies)
         {
+            if (configuration is null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            if (assemblies is null)
+            {
+                throw new ArgumentNullException(nameof(assemblies));
+            }
+
             services.AddOptions();
 
-            foreach (var type in assemblies.GetDefinedTypes())
+            foreach (var type in assemblies.GetDefinedTypes().Distinct())
             {
                 var location = type.GetCustomAttribute<ConfigLocationAttribute>();
                 if (location is not null)
@@ -63,7 +74,7 @@ public static class ConfigLocator
         private void AddConfigurationOf(IConfiguration configuration, Type type, ConfigLocationAttribute attribute)
         {
             var section = configuration.GetSection(attribute.SectionKey);
-            var types = type.WithAdditionalTypesOf(attribute).ToArray();
+            var types = type.WithAdditionalTypesOf(attribute).Distinct().ToArray();
 
             services.Configure(section, types);
         }
@@ -78,12 +89,9 @@ public static class ConfigLocator
     {
         yield return type;
 
-        if (attribute.AdditionalTypes is not null)
+        foreach (var additionalType in attribute.AdditionalTypes)
         {
-            foreach (var additionalType in attribute.AdditionalTypes)
-            {
-                yield return additionalType;
-            }
+            yield return additionalType;
         }
     }
 }

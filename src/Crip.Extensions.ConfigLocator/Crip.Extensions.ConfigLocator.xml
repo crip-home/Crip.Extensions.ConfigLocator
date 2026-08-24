@@ -1,0 +1,344 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Crip.Extensions.ConfigLocator</name>
+    </assembly>
+    <members>
+        <member name="T:Crip.Extensions.ConfigLocator.ConfigLocator">
+            <summary>
+            Configuration locator service extensions.
+            </summary>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.ConfigLocator.AddConfigLocator(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.ConfigLocator.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddConfigLocator(Microsoft.Extensions.Configuration.IConfiguration)"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.ConfigLocator.AddConfigLocator(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration,System.Reflection.Assembly[])">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.ConfigLocator.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddConfigLocator(Microsoft.Extensions.Configuration.IConfiguration,System.Reflection.Assembly[])"/>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.ConfigLocator.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.&lt;M&gt;$6BEA73177691D2862842D66CC9F1DED9">
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to add the services to.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.ConfigLocator.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddConfigLocator(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Register all options classes with <see cref="T:Crip.Extensions.ConfigLocator.ConfigLocationAttribute"/>
+            attribute from the calling assembly.
+            </summary>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> to read from.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> so that additional calls can be chained.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.ConfigLocator.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddConfigLocator(Microsoft.Extensions.Configuration.IConfiguration,System.Reflection.Assembly[])">
+            <summary>
+            Register all options classes with <see cref="T:Crip.Extensions.ConfigLocator.ConfigLocationAttribute"/>
+            attribute from provided <paramref name="assemblies"/>.
+            </summary>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> to read from.</param>
+            <param name="assemblies">
+            The collection of <see cref="T:System.Reflection.Assembly"/> where search for classes with
+            <see cref="T:Crip.Extensions.ConfigLocator.ConfigLocationAttribute"/> attribute.
+            </param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> so that additional calls can be chained.</returns>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.ConfigLocationAttribute">
+            <summary>
+            Configuration location attribute.
+            </summary>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.ConfigLocationAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Crip.Extensions.ConfigLocator.ConfigLocationAttribute"/> class.
+            </summary>
+            <param name="sectionKey">Application settings file section key.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.ConfigLocationAttribute.#ctor(System.String,System.Type[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Crip.Extensions.ConfigLocator.ConfigLocationAttribute"/> class.
+            </summary>
+            <param name="sectionKey">Application settings file section key.</param>
+            <param name="additionalTypes">Additional option types to be registered with value from same section.</param>
+        </member>
+        <member name="P:Crip.Extensions.ConfigLocator.ConfigLocationAttribute.AdditionalTypes">
+            <summary>
+            Gets additional option types to be registered with value from same section.
+            </summary>
+        </member>
+        <member name="P:Crip.Extensions.ConfigLocator.ConfigLocationAttribute.SectionKey">
+            <summary>
+            Gets application settings file section key.
+            </summary>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.ConfigValidateAttribute">
+            <summary>
+            Configuration validation attribute.
+            </summary>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.ConfigValidateAttribute.#ctor(System.Type[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Crip.Extensions.ConfigLocator.ConfigValidateAttribute"/> class.
+            </summary>
+            <param name="validators">The list of validator types associated with this options.</param>
+        </member>
+        <member name="P:Crip.Extensions.ConfigLocator.ConfigValidateAttribute.Validators">
+            <summary>
+            Gets the list of validator types associated with this options.
+            </summary>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.ConfigValidateAttribute`1">
+            <summary>
+            Configuration validation attribute with validator type.
+            </summary>
+            <typeparam name="TValidator">The type of the custom validator.</typeparam>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.ConfigValidateAttribute`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Crip.Extensions.ConfigLocator.ConfigValidateAttribute`1"/> class.
+            </summary>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions">
+            <summary>
+            Extension helper methods for options registration.
+            </summary>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions.GenericOptionsChangeTokenType(System.Type)">
+            <summary>
+            Create <see cref="T:Microsoft.Extensions.Options.IOptionsChangeTokenSource`1"/> type.
+            </summary>
+            <param name="typeArgument">The type of options type arguments.</param>
+            <returns>Options with provided generic parameter.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions.GenericOptionsChangeTokenInstance(Microsoft.Extensions.Configuration.IConfigurationSection,System.Type[])">
+            <summary>
+            Create <see cref="T:Microsoft.Extensions.Options.ConfigurationChangeTokenSource`1"/> instance.
+            </summary>
+            <param name="section">The configuration section of the settings.</param>
+            <param name="typeArguments">The type of options type arguments.</param>
+            <returns>Options with provided generic parameter.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions.GenericConfigureOptionsType(System.Type)">
+            <summary>
+            Create <see cref="T:Microsoft.Extensions.Options.IConfigureOptions`1"/> type.
+            </summary>
+            <param name="typeArgument">The type of options type arguments.</param>
+            <returns>Options with provided generic parameter.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions.GenericValidateOptionsType(System.Type)">
+            <summary>
+            Create <see cref="T:Microsoft.Extensions.Options.IValidateOptions`1"/> type.
+            </summary>
+            <param name="typeArgument">The type of options type arguments.</param>
+            <returns>Validate options with provided generic parameter.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions.GenericConfigureOptionsInstance(Microsoft.Extensions.Configuration.IConfigurationSection,System.Type[])">
+            <summary>
+            Create <see cref="T:Microsoft.Extensions.Options.NamedConfigureFromConfigurationOptions`1"/> instance.
+            </summary>
+            <param name="section">The configuration section of the settings.</param>
+            <param name="typeArguments">The type of options type arguments.</param>
+            <returns>Options with provided generic parameter.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Configurations.OptionsExtensions.GenericDataAnnotationValidateOptionsInstance(System.Type[])">
+            <summary>
+            Create <see cref="T:Microsoft.Extensions.Options.DataAnnotationValidateOptions`1"/> instance.
+            </summary>
+            <param name="typeArguments">The type of options type arguments.</param>
+            <returns>Validate options with provided generic parameter.</returns>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions">
+            <summary>
+            Extensions for configuration dependency injection.
+            </summary>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.Configure(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfigurationSection,System.Type[])">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.Configure(Microsoft.Extensions.Configuration.IConfigurationSection,System.Type[])"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.Configure(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfigurationSection,System.Type)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.Configure(Microsoft.Extensions.Configuration.IConfigurationSection,System.Type)"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.AddDataAnnotationValidateOptions(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Type)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddDataAnnotationValidateOptions(System.Type)"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.AddCustomValidateOptions(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Type,System.Type[])">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddCustomValidateOptions(System.Type,System.Type[])"/>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.&lt;M&gt;$6BEA73177691D2862842D66CC9F1DED9">
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to add the services to.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.Configure(Microsoft.Extensions.Configuration.IConfigurationSection,System.Type[])">
+            <summary>
+            Registers a configuration instance which <paramref name="optionTypes"/> will bind against.
+            </summary>
+            <param name="section">The configuration being bound.</param>
+            <param name="optionTypes">The types of options being configured.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.Configure(Microsoft.Extensions.Configuration.IConfigurationSection,System.Type)">
+            <summary>
+            Registers a configuration instance which <paramref name="optionsType"/> will bind against.
+            </summary>
+            <param name="section">The configuration being bound.</param>
+            <param name="optionsType">The type of options being configured.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddDataAnnotationValidateOptions(System.Type)">
+            <summary>
+            Registers data annotation option validation instance for <paramref name="optionsType"/> type.
+            </summary>
+            <param name="optionsType">The type of options being configured.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.DependencyInjection.ConfigurationInjectionExtensions.&lt;G&gt;$7B30185E57B8298C6754F16C0BCF4773.AddCustomValidateOptions(System.Type,System.Type[])">
+            <summary>
+            Registers custom option validation instance for <paramref name="optionsType"/> type.
+            </summary>
+            <param name="optionsType">The type of options being configured.</param>
+            <param name="validatorTypes">The list of custom validator types.</param>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.Exceptions.AttributeLoadException`1">
+            <summary>
+            Attribute load exception.
+            </summary>
+            <typeparam name="T">The type of the attribute.</typeparam>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Exceptions.AttributeLoadException`1.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Crip.Extensions.ConfigLocator.Exceptions.AttributeLoadException`1"/> class.
+            </summary>
+            <param name="sourceType">The type of the class where load was failed.</param>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions">
+            <summary>
+            Extensions for assemblies.
+            </summary>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.GetDefinedTypes(System.Collections.Generic.IEnumerable{System.Reflection.Assembly})">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$CB4477130C8F25552BBCCF02CEB1B9DF.GetDefinedTypes"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.TypesWithAttribute``1(System.Collections.Generic.IEnumerable{System.Reflection.Assembly})">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$CB4477130C8F25552BBCCF02CEB1B9DF.TypesWithAttribute``1"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.TypesWithAttribute(System.Collections.Generic.IEnumerable{System.Reflection.Assembly},System.Type)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$CB4477130C8F25552BBCCF02CEB1B9DF.TypesWithAttribute(System.Type)"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.GetDefinedTypes(System.Reflection.Assembly)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$9EA1809196CC07098857FF38CF65557B.GetDefinedTypes"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.TypesWithAttribute``1(System.Reflection.Assembly)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$9EA1809196CC07098857FF38CF65557B.TypesWithAttribute``1"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.TypesWithAttribute(System.Reflection.Assembly,System.Type)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$9EA1809196CC07098857FF38CF65557B.TypesWithAttribute(System.Type)"/>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$CB4477130C8F25552BBCCF02CEB1B9DF.&lt;M&gt;$E2FE428C48E83481F62F00FCC1B385B1">
+            <param name="assemblies">The collection of <see cref="T:System.Reflection.Assembly"/> to search in.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$CB4477130C8F25552BBCCF02CEB1B9DF.GetDefinedTypes">
+            <summary>
+            Get all non-abstract class types from provided assemblies.
+            </summary>
+            <returns>The collection of all non-abstract class types.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$CB4477130C8F25552BBCCF02CEB1B9DF.TypesWithAttribute``1">
+            <summary>
+            Get all <see cref="T:System.Type"/> instances with defined <typeparamref name="TAttribute"/> on them.
+            </summary>
+            <typeparam name="TAttribute">The type of attribute to search for.</typeparam>
+            <returns>The collection of all types with <typeparamref name="TAttribute"/> attribute.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$CB4477130C8F25552BBCCF02CEB1B9DF.TypesWithAttribute(System.Type)">
+            <summary>
+            Get all <see cref="T:System.Type"/> instances with defined <paramref name="attributeType"/> on them.
+            </summary>
+            <param name="attributeType">The type of attribute to search for.</param>
+            <returns>The collection of all types with <paramref name="attributeType"/> attribute.</returns>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$9EA1809196CC07098857FF38CF65557B.&lt;M&gt;$F93E803BF9E09542B5C35F46339499B4">
+            <param name="assembly">The <see cref="T:System.Reflection.Assembly"/> to search in.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$9EA1809196CC07098857FF38CF65557B.GetDefinedTypes">
+            <summary>
+            Get all non-abstract class types from provided assembly.
+            </summary>
+            <returns>The collection of all non-abstract class types.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$9EA1809196CC07098857FF38CF65557B.TypesWithAttribute``1">
+            <summary>
+            Get all <see cref="T:System.Type"/> instances with defined <typeparamref name="TAttribute"/> on them.
+            </summary>
+            <typeparam name="TAttribute">The type of attribute to search for.</typeparam>
+            <returns>The collection of all types with <typeparamref name="TAttribute"/> attribute.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.AssemblyExtensions.&lt;G&gt;$9EA1809196CC07098857FF38CF65557B.TypesWithAttribute(System.Type)">
+            <summary>
+            Get all <see cref="T:System.Type"/> instances with defined <paramref name="attributeType"/> on them.
+            </summary>
+            <param name="attributeType">The type of attribute to search for.</param>
+            <returns>The collection of all types with <paramref name="attributeType"/> attribute.</returns>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.Generics.TypeExtensions">
+            <summary>
+            Extensions for types.
+            </summary>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.SimpleName(System.Type)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$6B6159A298CA62A8C577E514BE40E3DD.SimpleName"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.IsNonAbstractClass(System.Type)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$6B6159A298CA62A8C577E514BE40E3DD.IsNonAbstractClass"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.HasAttribute``1(System.Type)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$6B6159A298CA62A8C577E514BE40E3DD.HasAttribute``1"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.HasAttribute(System.Type,System.Type)">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$6B6159A298CA62A8C577E514BE40E3DD.HasAttribute(System.Type)"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.MakeGenericInstance(System.Type,System.Type[],System.Object[])">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$6B6159A298CA62A8C577E514BE40E3DD.MakeGenericInstance(System.Type[],System.Object[])"/>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.WithAttribute``1(System.Collections.Generic.IEnumerable{System.Type})">
+            <inheritdoc cref="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$99D24EDD37C930E20A5CF0E641F2B664.WithAttribute``1"/>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$6B6159A298CA62A8C577E514BE40E3DD.&lt;M&gt;$8377F7E7F2B49410D74D1097D20FDAD7">
+            <param name="type">The type to get the name of.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$6B6159A298CA62A8C577E514BE40E3DD.SimpleName">
+            <summary>
+            Get a simple name of the type.
+            </summary>
+            <returns>Simple name of the type (without generic parameters).</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$6B6159A298CA62A8C577E514BE40E3DD.IsNonAbstractClass">
+            <summary>
+            Determine is the provided type is not abstract.
+            </summary>
+            <returns><c>true</c> if type is not abstract, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$6B6159A298CA62A8C577E514BE40E3DD.HasAttribute``1">
+            <summary>
+            Determine whenever the provided type has attribute.
+            </summary>
+            <typeparam name="TAttribute">The type of attribute to check.</typeparam>
+            <returns><c>true</c> if type has provided attribute, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$6B6159A298CA62A8C577E514BE40E3DD.HasAttribute(System.Type)">
+            <summary>
+            Determine whenever the provided type has attribute.
+            </summary>
+            <param name="attribute">The type of attribute to check.</param>
+            <returns><c>true</c> if type has provided attribute, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$6B6159A298CA62A8C577E514BE40E3DD.MakeGenericInstance(System.Type[],System.Object[])">
+            <summary>
+            Creates generic instance of the <paramref name="type"/>.
+            </summary>
+            <param name="typeArguments">The generic type arguments.</param>
+            <param name="instanceArgs">The arguments provided to create an instance.</param>
+            <returns>Created instance.</returns>
+        </member>
+        <member name="T:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$99D24EDD37C930E20A5CF0E641F2B664.&lt;M&gt;$83B39FD188E8C912732A4342093340AF">
+            <param name="types">The collection of types to filter.</param>
+        </member>
+        <member name="M:Crip.Extensions.ConfigLocator.Generics.TypeExtensions.&lt;G&gt;$99D24EDD37C930E20A5CF0E641F2B664.WithAttribute``1">
+            <summary>
+            Filter collection of types by attribute.
+            </summary>
+            <typeparam name="TAttribute">The type of attribute to check.</typeparam>
+            <returns>The collection of types with provided attribute.</returns>
+        </member>
+    </members>
+</doc>

@@ -12,28 +12,24 @@
     <Authors>TAHQ69</Authors>
     <Company>CRIP</Company>
     <Title>$(AssemblyName)</Title>
-    <Description>Automatic configuration class injection in to DI with attributes.</Description>
-    <PackageDescription>Automatic configuration class injection in to DI with attributes.</PackageDescription>
+    <Description>Automatic configuration class injection into DI with attributes.</Description>
+    <PackageDescription>Automatic configuration class injection into DI with attributes.</PackageDescription>
     <RepositoryUrl>https://github.com/crip-home/$(AssemblyName)</RepositoryUrl>
     <PackageProjectUrl>https://github.com/crip-home/$(AssemblyName)</PackageProjectUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageReadmeFile>README.MD</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <PackageTags>AspNetCore;configuration;options</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>1701;1702;SA1101;SA1633;SA1200;SA1309;SA1501;SA1503;SA1402</NoWarn>
+    <NoWarn>1701;1702;SA1101;SA1633;SA1200;SA1309;SA1501;SA1503;SA1402;SA1518</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="$(AssemblyName).xml" />
-    <None Include="../README.MD" Pack="true" PackagePath="\" />
-    <None Include="../LICENSE" Pack="true" PackagePath="\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="$(AssemblyName).xml" />
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+    <None Include="../../LICENSE" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>

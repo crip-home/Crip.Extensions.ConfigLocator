@@ -16,7 +16,7 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/Tests/">
-    <Project Path="Crip.Extensions.ConfigLocator.Tests/Crip.Extensions.ConfigLocator.Tests.csproj" />
+    <Project Path="tests/Crip.Extensions.ConfigLocator.Tests/Crip.Extensions.ConfigLocator.Tests.csproj" />
   </Folder>
-  <Project Path="Crip.Extensions.ConfigLocator/Crip.Extensions.ConfigLocator.csproj" />
+  <Project Path="src/Crip.Extensions.ConfigLocator/Crip.Extensions.ConfigLocator.csproj" />
 </Solution>

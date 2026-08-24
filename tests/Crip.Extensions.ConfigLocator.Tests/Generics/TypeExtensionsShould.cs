@@ -41,7 +41,7 @@ public class TypeExtensionsShould
     public void MakeGenericInstance_WithInt()
     {
         const string value = "test";
-        var result = typeof(Generic<>).MakeGenericInstance(new[] { typeof(int) }, value);
+        var result = typeof(Generic<>).MakeGenericInstance([typeof(int)], [value]);
         result
             .Should().BeOfType(typeof(Generic<int>))
             .And.BeEquivalentTo(new Generic<int>(value));
@@ -50,17 +50,25 @@ public class TypeExtensionsShould
     [Fact]
     public void MakeGenericInstance_ThrowsInvalidOperationOnNonGeneric()
     {
-        Action act = () => typeof(PublicClass).MakeGenericInstance(new[] { typeof(int) });
+        Action act = () => typeof(PublicClass).MakeGenericInstance([typeof(int)]);
         act.Should()
             .ThrowExactly<InvalidOperationException>()
-            .WithMessage("Crip.Extensions.ConfigLocator.Tests.Generics.TypeExtensionsShould+PublicClass is not a GenericTypeDefinition. " +
-                         "MakeGenericType may only be called on a type for which Type.IsGenericTypeDefinition is true.");
+            .WithMessage("Type 'Crip.Extensions.ConfigLocator.Tests.Generics.TypeExtensionsShould+PublicClass' is not a generic type definition.");
+    }
+
+    [Fact]
+    public void MakeGenericInstance_ThrowsForWrongArity()
+    {
+        Action act = () => typeof(Pair<,>).MakeGenericInstance([typeof(int)]);
+        act.Should()
+            .ThrowExactly<ArgumentException>()
+            .WithParameterName("typeArguments");
     }
 
     [Fact]
     public void MakeGenericInstance_ThrowsMissingMethodException()
     {
-        Action act = () => typeof(Generic<>).MakeGenericInstance(new[] { typeof(int) });
+        Action act = () => typeof(Generic<>).MakeGenericInstance([typeof(int)]);
         act.Should()
             .ThrowExactly<MissingMethodException>()
             .WithMessage("Constructor on type 'Crip.Extensions.ConfigLocator.Tests.Generics.TypeExtensionsShould+Generic*");
@@ -81,6 +89,10 @@ public class TypeExtensionsShould
     }
 
     public class PublicClass
+    {
+    }
+
+    internal class Pair<TFirst, TSecond>
     {
     }
 

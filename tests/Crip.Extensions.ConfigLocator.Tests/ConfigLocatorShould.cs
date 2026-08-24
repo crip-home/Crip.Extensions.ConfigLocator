@@ -8,7 +8,7 @@ namespace Crip.Extensions.ConfigLocator.Tests;
 
 public class ConfigLocatorShould
 {
-    private static readonly Dictionary<string, string> ConfigurationData = new()
+    private static readonly Dictionary<string, string?> ConfigurationData = new()
     {
         { "MyOptions:Foo", "Value" },
     };
@@ -21,7 +21,7 @@ public class ConfigLocatorShould
     [Fact]
     public void AddConfigLocator_RegistersAllInstancesInDI()
     {
-        _services.Object.AddConfigLocator(_configuration, typeof(ConfigLocatorShould).Assembly);
+        _services.Object.AddConfigLocator(_configuration, [typeof(ConfigLocatorShould).Assembly]);
         _services
             .ContainsSingletonService<IConfigureOptions<MyOptions>,
                 NamedConfigureFromConfigurationOptions<MyOptions>>();
@@ -62,7 +62,7 @@ public class ConfigLocatorShould
 
     public class FooOptionValidator : IValidateOptions<FooOptions>
     {
-        public ValidateOptionsResult Validate(string name, FooOptions options)
+        public ValidateOptionsResult Validate(string? name, FooOptions options)
         {
             return ValidateOptionsResult.Success;
         }
@@ -70,7 +70,7 @@ public class ConfigLocatorShould
 
     public class BarOptionValidator : IValidateOptions<BarOptions>
     {
-        public ValidateOptionsResult Validate(string name, BarOptions options)
+        public ValidateOptionsResult Validate(string? name, BarOptions options)
         {
             return ValidateOptionsResult.Success;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Crip.Extensions.ConfigLocator.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,8 +19,11 @@ public static class ConfigurationInjectionExtensions
         /// </summary>
         /// <param name="section">The configuration being bound.</param>
         /// <param name="optionTypes">The types of options being configured.</param>
-        public void Configure(IConfigurationSection section, params Type[] optionTypes)
+        public void Configure(IConfigurationSection section, params Type[]? optionTypes)
         {
+            ValidateSection(section);
+            optionTypes = ValidateOptionTypes(optionTypes);
+
             foreach (var type in optionTypes)
             {
                 services.Configure(section, type);
@@ -33,6 +37,9 @@ public static class ConfigurationInjectionExtensions
         /// <param name="optionsType">The type of options being configured.</param>
         public void Configure(IConfigurationSection section, Type optionsType)
         {
+            ValidateSection(section);
+            ValidateOptionType(optionsType);
+
             services.Add(section.GenericOptionsChangeToken(optionsType));
             services.Add(section.GenericConfigureOptions(optionsType));
         }
@@ -41,16 +48,22 @@ public static class ConfigurationInjectionExtensions
         /// Registers data annotation option validation instance for <paramref name="optionsType"/> type.
         /// </summary>
         /// <param name="optionsType">The type of options being configured.</param>
-        public void AddDataAnnotationValidateOptions(Type optionsType) =>
+        public void AddDataAnnotationValidateOptions(Type optionsType)
+        {
+            ValidateOptionType(optionsType);
             services.Add(optionsType.GenericDataAnnotationValidateOptions());
+        }
 
         /// <summary>
         /// Registers custom option validation instance for <paramref name="optionsType"/> type.
         /// </summary>
         /// <param name="optionsType">The type of options being configured.</param>
         /// <param name="validatorTypes">The list of custom validator types.</param>
-        public void AddCustomValidateOptions(Type optionsType, params Type[] validatorTypes)
+        public void AddCustomValidateOptions(Type optionsType, params Type[]? validatorTypes)
         {
+            ValidateOptionType(optionsType);
+            validatorTypes = ValidateValidatorTypes(validatorTypes);
+
             foreach (var validatorType in validatorTypes)
             {
                 services.Add(GenericValidateOptions(optionsType, validatorType));
@@ -80,7 +93,7 @@ public static class ConfigurationInjectionExtensions
 
     private static ServiceDescriptor GenericDataAnnotationValidateOptions(this Type optionsType)
     {
-        var typeArguments = new[] { optionsType };
+        Type[] typeArguments = [optionsType];
         var serviceType = typeArguments[0].GenericValidateOptionsType();
         var instance = OptionsExtensions.GenericDataAnnotationValidateOptionsInstance(typeArguments);
 
@@ -89,8 +102,57 @@ public static class ConfigurationInjectionExtensions
 
     private static ServiceDescriptor GenericValidateOptions(Type optionsType, Type validatorType)
     {
+        ValidateOptionType(optionsType);
+        ValidateOptionType(validatorType);
+
         var serviceType = optionsType.GenericValidateOptionsType();
 
         return new ServiceDescriptor(serviceType, validatorType, ServiceLifetime.Singleton);
+    }
+
+    private static void ValidateSection(IConfigurationSection section)
+    {
+        if (section is null)
+        {
+            throw new ArgumentNullException(nameof(section));
+        }
+    }
+
+    private static void ValidateOptionType(Type optionType)
+    {
+        if (optionType is null)
+        {
+            throw new ArgumentNullException(nameof(optionType));
+        }
+    }
+
+    private static Type[] ValidateOptionTypes(Type[]? optionTypes)
+    {
+        if (optionTypes is null)
+        {
+            throw new ArgumentNullException(nameof(optionTypes));
+        }
+
+        if (optionTypes.Any(type => type is null))
+        {
+            throw new ArgumentException("Option types cannot contain null entries.", nameof(optionTypes));
+        }
+
+        return optionTypes;
+    }
+
+    private static Type[] ValidateValidatorTypes(Type[]? validatorTypes)
+    {
+        if (validatorTypes is null)
+        {
+            throw new ArgumentNullException(nameof(validatorTypes));
+        }
+
+        if (validatorTypes.Any(type => type is null))
+        {
+            throw new ArgumentException("Validator types cannot contain null entries.", nameof(validatorTypes));
+        }
+
+        return validatorTypes;
     }
 }

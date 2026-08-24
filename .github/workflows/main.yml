@@ -15,8 +15,8 @@ jobs:
     env:
       BUILD_CONFIG: Release
       SOLUTION: Crip.Extensions.ConfigLocator.slnx
-      LIBRARY: Crip.Extensions.ConfigLocator/Crip.Extensions.ConfigLocator.csproj
-      TESTS: Crip.Extensions.ConfigLocator.Tests/Crip.Extensions.ConfigLocator.Tests.csproj
+      LIBRARY: src/Crip.Extensions.ConfigLocator/Crip.Extensions.ConfigLocator.csproj
+      TESTS: tests/Crip.Extensions.ConfigLocator.Tests/Crip.Extensions.ConfigLocator.Tests.csproj
 
     runs-on: ubuntu-latest
     permissions:
@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: 📄 checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 💼 dump GitHub context
         env:
@@ -41,15 +41,13 @@ jobs:
       - name: 🔧 get build version
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          arrTag=(${GITHUB_REF//\// })
-          BUILD_VERSION="${arrTag[2]}"
-          BUILD_VERSION="${BUILD_VERSION//v}"
+          BUILD_VERSION="${GITHUB_REF#refs/tags/v}"
           echo "BUILD_VERSION=${BUILD_VERSION}" >> $GITHUB_ENV
           echo $BUILD_VERSION
         shell: bash
 
       - name: 📥 setup .NET 8.0 & 10.0
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             8.0.x
@@ -67,10 +65,12 @@ jobs:
       - name: 🚀 publish GitHub NuGet
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          dotnet nuget push **/*${BUILD_VERSION}.nupkg \
-            -s https://nuget.pkg.github.com/crip-home/index.json \
-            -k ${{ secrets.GITHUB_TOKEN }} \
-            --skip-duplicate
+          find . -name "*${BUILD_VERSION}.nupkg" -print -quit | while read -r package; do
+            dotnet nuget push "$package" \
+              -s https://nuget.pkg.github.com/crip-home/index.json \
+              -k ${{ secrets.GITHUB_TOKEN }} \
+              --skip-duplicate
+          done
 
       - name: 🔐 login to NuGet
         if: startsWith(github.ref, 'refs/tags/v')
@@ -82,7 +82,9 @@ jobs:
       - name: 🚀 publish to nuget.org
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          dotnet nuget push **/*${BUILD_VERSION}.nupkg \
-            -s 'https://api.nuget.org/v3/index.json' \
-            -k ${{ steps.login.outputs.NUGET_API_KEY }} \
-            --skip-duplicate
+          find . -name "*${BUILD_VERSION}.nupkg" -print -quit | while read -r package; do
+            dotnet nuget push "$package" \
+              -s 'https://api.nuget.org/v3/index.json' \
+              -k ${{ steps.login.outputs.NUGET_API_KEY }} \
+              --skip-duplicate
+          done

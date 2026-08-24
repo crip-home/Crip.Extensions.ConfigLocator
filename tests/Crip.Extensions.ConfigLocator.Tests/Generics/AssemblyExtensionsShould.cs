@@ -12,7 +12,7 @@ public class AssemblyExtensionsShould
     [Fact]
     public void TypesWithAttribute_ReturnsEmptyResultForAssemblyArray()
     {
-        var assemblies = new[] { _testAssembly };
+        Assembly[] assemblies = [_testAssembly];
 
         var result = assemblies.TypesWithAttribute<SpecialNameAttribute>();
 
