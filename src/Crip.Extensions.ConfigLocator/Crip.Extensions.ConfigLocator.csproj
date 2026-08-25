@@ -30,10 +30,10 @@
     <None Remove="$(AssemblyName).xml" />
     <None Include="../../README.md" Pack="true" PackagePath="\" />
     <None Include="../../LICENSE" Pack="true" PackagePath="\" />
-    <None Include="build\Crip.Extensions.ConfigLocator.targets" Pack="true" PackagePath="build\Crip.Extensions.ConfigLocator.targets" />
-    <None Include="build\Crip.Extensions.ConfigLocator.targets" Pack="true" PackagePath="buildTransitive\Crip.Extensions.ConfigLocator.targets" />
-    <None Include="..\..\.github\skills\config-locator-code-review\**\*" Pack="true" PackagePath="build\skills\config-locator-code-review\%(RecursiveDir)%(Filename)%(Extension)" />
-    <None Include="..\..\.github\skills\config-locator-code-review\**\*" Pack="true" PackagePath="buildTransitive\skills\config-locator-code-review\%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Include="build/Crip.Extensions.ConfigLocator.targets" Pack="true" PackagePath="build\Crip.Extensions.ConfigLocator.targets" />
+    <None Include="build/Crip.Extensions.ConfigLocator.targets" Pack="true" PackagePath="buildTransitive\Crip.Extensions.ConfigLocator.targets" />
+    <None Include="../../.github/skills/config-locator-code-review/**/*" Pack="true" PackagePath="build\skills\config-locator-code-review\%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Include="../../.github/skills/config-locator-code-review/**/*" Pack="true" PackagePath="buildTransitive\skills\config-locator-code-review\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
