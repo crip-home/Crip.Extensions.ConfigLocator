@@ -25,6 +25,8 @@ nupkg/
 x64/
 x86/
 build/
+!src/Crip.Extensions.ConfigLocator/build/
+!src/Crip.Extensions.ConfigLocator/build/**
 bld/
 [Bb]in/
 [Oo]bj/

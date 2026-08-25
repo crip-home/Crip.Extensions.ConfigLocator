@@ -30,6 +30,8 @@
     <None Remove="$(AssemblyName).xml" />
     <None Include="../../README.md" Pack="true" PackagePath="\" />
     <None Include="../../LICENSE" Pack="true" PackagePath="\" />
+    <None Include="build/Crip.Extensions.ConfigLocator.targets" Pack="true" PackagePath="build\Crip.Extensions.ConfigLocator.targets" />
+    <None Include="../../.github/skills/config-locator/**/*" Pack="true" PackagePath="build\skills\config-locator\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

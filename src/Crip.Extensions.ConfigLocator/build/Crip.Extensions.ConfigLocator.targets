@@ -1,0 +1,35 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ConfigLocatorSkillDirectoryName Condition="'$(ConfigLocatorSkillDirectoryName)' == ''">config-locator</ConfigLocatorSkillDirectoryName>
+    <ConfigLocatorSkillInstallEnabled Condition="'$(ConfigLocatorDisableSkillInstall)' == 'true'">false</ConfigLocatorSkillInstallEnabled>
+    <ConfigLocatorSkillInstallEnabled Condition="'$(ConfigLocatorSkillInstallEnabled)' == ''">true</ConfigLocatorSkillInstallEnabled>
+
+    <ConfigLocatorSkillSolutionRoot Condition="'$(ConfigLocatorSkillInstallRoot)' == '' and '$(SolutionDir)' != ''">$([System.IO.Path]::GetFullPath('$(SolutionDir)'))</ConfigLocatorSkillSolutionRoot>
+    <ConfigLocatorSkillRepositoryRoot Condition="'$(ConfigLocatorSkillInstallRoot)' == '' and '$(ConfigLocatorSkillSolutionRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove('$(MSBuildProjectDirectory)', '.git'))</ConfigLocatorSkillRepositoryRoot>
+
+    <ConfigLocatorSkillInstallRoot Condition="'$(ConfigLocatorSkillInstallRoot)' == '' and '$(ConfigLocatorSkillSolutionRoot)' != ''">$(ConfigLocatorSkillSolutionRoot)</ConfigLocatorSkillInstallRoot>
+    <ConfigLocatorSkillInstallRoot Condition="'$(ConfigLocatorSkillInstallRoot)' == '' and '$(ConfigLocatorSkillRepositoryRoot)' != ''">$(ConfigLocatorSkillRepositoryRoot)</ConfigLocatorSkillInstallRoot>
+    <ConfigLocatorSkillInstallRoot Condition="'$(ConfigLocatorSkillInstallRoot)' == ''">$(MSBuildProjectDirectory)</ConfigLocatorSkillInstallRoot>
+
+    <!-- Prefer an already-existing agent/IDE folder; fall back to creating .agents -->
+    <ConfigLocatorSkillInstallDirectory Condition="'$(ConfigLocatorSkillInstallDirectory)' == '' and Exists('$(ConfigLocatorSkillInstallRoot)\.github')">$(ConfigLocatorSkillInstallRoot)\.github\skills\$(ConfigLocatorSkillDirectoryName)</ConfigLocatorSkillInstallDirectory>
+    <ConfigLocatorSkillInstallDirectory Condition="'$(ConfigLocatorSkillInstallDirectory)' == '' and Exists('$(ConfigLocatorSkillInstallRoot)\.codex')">$(ConfigLocatorSkillInstallRoot)\.codex\skills\$(ConfigLocatorSkillDirectoryName)</ConfigLocatorSkillInstallDirectory>
+    <ConfigLocatorSkillInstallDirectory Condition="'$(ConfigLocatorSkillInstallDirectory)' == '' and Exists('$(ConfigLocatorSkillInstallRoot)\.claude')">$(ConfigLocatorSkillInstallRoot)\.claude\skills\$(ConfigLocatorSkillDirectoryName)</ConfigLocatorSkillInstallDirectory>
+    <ConfigLocatorSkillInstallDirectory Condition="'$(ConfigLocatorSkillInstallDirectory)' == '' and Exists('$(ConfigLocatorSkillInstallRoot)\.junie')">$(ConfigLocatorSkillInstallRoot)\.junie\skills\$(ConfigLocatorSkillDirectoryName)</ConfigLocatorSkillInstallDirectory>
+    <ConfigLocatorSkillInstallDirectory Condition="'$(ConfigLocatorSkillInstallDirectory)' == ''">$(ConfigLocatorSkillInstallRoot)\.agents\$(ConfigLocatorSkillDirectoryName)</ConfigLocatorSkillInstallDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <_ConfigLocatorSkillFiles Include="$(MSBuildThisFileDirectory)skills\$(ConfigLocatorSkillDirectoryName)\**\*" />
+  </ItemGroup>
+
+  <Target Name="InstallConfigLocatorSkill"
+          AfterTargets="Restore;Build"
+          Condition="'$(ConfigLocatorSkillInstallEnabled)' == 'true' and '@(_ConfigLocatorSkillFiles)' != ''">
+    <MakeDir Directories="$(ConfigLocatorSkillInstallDirectory)" />
+    <MakeDir Directories="@(_ConfigLocatorSkillFiles->'$(ConfigLocatorSkillInstallDirectory)\%(RecursiveDir)')" />
+    <Copy SourceFiles="@(_ConfigLocatorSkillFiles)"
+          DestinationFiles="@(_ConfigLocatorSkillFiles->'$(ConfigLocatorSkillInstallDirectory)\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>
