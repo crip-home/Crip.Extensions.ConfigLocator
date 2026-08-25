@@ -5,7 +5,7 @@
 
 `Crip.Extensions.ConfigLocator` helps ASP.NET Core apps register options classes automatically.
 
-Instead of writing `services.Configure<TOptions>(...)` for every class, mark your options with an attribute and let the library do the wiring.
+Instead of scattering `AddOptions<T>().Bind(...)` or `services.Configure<TOptions>(...)` across startup, mark your options with an attribute and let the library do the wiring.
 
 ## What it does
 
@@ -24,6 +24,8 @@ Install the package:
 dotnet add package Crip.Extensions.ConfigLocator
 ```
 
+The package also ships a project skill to `.github/skills/config-locator-code-review`, which gives Copilot migration and review guidance for this library in consuming repositories.
+
 Register it in `Program.cs`:
 
 ```csharp
@@ -31,7 +33,18 @@ using Crip.Extensions.ConfigLocator;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Put config locator registration in the composition root, right after
+// the builder is created and before services that consume options.
 builder.Services.AddConfigLocator(builder.Configuration);
+```
+
+If your attributed options live outside the entry assembly, pass those assemblies explicitly:
+
+```csharp
+builder.Services.AddConfigLocator(
+    builder.Configuration,
+    typeof(MyOptions).Assembly,
+    typeof(SharedOptionsMarker).Assembly);
 ```
 
 ---
@@ -71,6 +84,28 @@ public class GitHubService(IOptions<GitHubOptions> options)
 
     public void DoSomething() => Console.WriteLine(_options.ApiKey);
 }
+```
+
+---
+
+## Copilot skill
+
+The package includes a repository skill at `.github/skills/config-locator-code-review/SKILL.md`.
+
+Its guidance is focused on:
+
+- where `AddConfigLocator(...)` should be initialized
+- how to migrate from `AddOptions<T>().Bind(...)` to `ConfigLocationAttribute`
+- how to review changes and steer owned options types away from manual binding
+
+The packaged MSBuild target copies the skill to the consuming solution root when `$(SolutionDir)` is available, falls back to the repository root when a `.git` directory is found, and finally falls back to the project directory.
+
+You can disable automatic installation in a consuming project by setting:
+
+```xml
+<PropertyGroup>
+  <ConfigLocatorDisableSkillInstall>true</ConfigLocatorDisableSkillInstall>
+</PropertyGroup>
 ```
 
 ---
@@ -116,6 +151,8 @@ public class MyOptions
 // [ConfigValidate(typeof(MyOptionsValidator))]
 ```
 
+This keeps validation on the options type instead of registering `IValidateOptions<T>` manually in `Program.cs`.
+
 ---
 
 ## More than one type
@@ -155,6 +192,42 @@ public class GitHubClient(IOptionsMonitor<GitHubOptions> options)
     private readonly GitHubOptions _us = options.Get("us");
 }
 ```
+
+---
+
+## Migrating from manual binding
+
+Prefer this migration path for owned options types:
+
+1. Move the section path to `[ConfigLocation("...")]` on the options class.
+2. Move validation to `[ConfigValidate]` or `[ConfigValidate<TValidator>]`.
+3. Add `builder.Services.AddConfigLocator(builder.Configuration);` in startup.
+4. Remove manual `AddOptions<T>()`, `.Bind(...)`, `Configure<T>(...)`, and manual validator registration for that type.
+
+Example migration:
+
+```csharp
+// Before
+builder.Services.AddOptions<PaymentsOptions>()
+    .Bind(builder.Configuration.GetSection("Payments"))
+    .ValidateDataAnnotations();
+
+builder.Services.AddSingleton<IValidateOptions<PaymentsOptions>, PaymentsOptionsValidator>();
+```
+
+```csharp
+// After
+[ConfigLocation("Payments")]
+[ConfigValidate<PaymentsOptionsValidator>]
+public class PaymentsOptions
+{
+    public string ApiKey { get; set; } = string.Empty;
+}
+
+builder.Services.AddConfigLocator(builder.Configuration);
+```
+
+For step-by-step migration and review guidance inside Copilot, use the shipped `config-locator-code-review` skill.
 
 ---
 
