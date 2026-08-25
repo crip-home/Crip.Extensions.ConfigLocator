@@ -1,5 +1,5 @@
 ---
-name: config-locator-code-review
+name: config-locator
 description: Guides migration and code review for Crip.Extensions.ConfigLocator. Use this when adding configuration options, placing AddConfigLocator initialization, migrating from AddOptions<T>().Bind(...), or reviewing code that should prefer ConfigLocationAttribute over manual binding.
 license: MIT
 ---
